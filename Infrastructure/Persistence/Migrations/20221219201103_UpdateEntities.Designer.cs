@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,42 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221219201103_UpdateEntities")]
+    partial class UpdateEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.0");
-
-            modelBuilder.Entity("Domain.Entities.Cart", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItemId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("Carts");
-                });
 
             modelBuilder.Entity("Domain.Entities.Customer", b =>
                 {
@@ -65,7 +38,12 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Customers");
                 });
@@ -121,8 +99,6 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId");
-
                     b.ToTable("Employees");
                 });
 
@@ -141,6 +117,9 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Photo")
                         .HasColumnType("TEXT");
 
@@ -151,6 +130,8 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
 
                     b.ToTable("Items");
                 });
@@ -173,6 +154,9 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal>("Tip")
                         .HasColumnType("TEXT");
 
@@ -181,9 +165,14 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("CustomerId")
+                        .IsUnique();
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId")
+                        .IsUnique();
 
                     b.ToTable("Orders");
                 });
@@ -257,23 +246,15 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Cart", b =>
+            modelBuilder.Entity("Domain.Entities.Customer", b =>
                 {
-                    b.HasOne("Domain.Entities.Item", "Item")
-                        .WithMany("Carts")
-                        .HasForeignKey("ItemId")
+                    b.HasOne("Domain.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Order", "Order")
-                        .WithMany("Carts")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Item");
-
-                    b.Navigation("Order");
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Domain.Entities.Delivery", b =>
@@ -287,34 +268,42 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Employee", b =>
+            modelBuilder.Entity("Domain.Entities.Item", b =>
                 {
-                    b.HasOne("Domain.Entities.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
+                    b.HasOne("Domain.Entities.Order", "Order")
+                        .WithMany("Items")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Tenant");
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
                     b.HasOne("Domain.Entities.Customer", "Customer")
-                        .WithMany("Orders")
-                        .HasForeignKey("CustomerId")
+                        .WithOne("Order")
+                        .HasForeignKey("Domain.Entities.Order", "CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Employee", "Employee")
-                        .WithMany("Orders")
-                        .HasForeignKey("EmployeeId")
+                        .WithOne("Order")
+                        .HasForeignKey("Domain.Entities.Order", "EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Tenant", "Tenant")
+                        .WithOne("Order")
+                        .HasForeignKey("Domain.Entities.Order", "TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
 
                     b.Navigation("Employee");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Domain.Entities.Payment", b =>
@@ -349,26 +338,29 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Customer", b =>
                 {
-                    b.Navigation("Orders");
+                    b.Navigation("Order")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.Employee", b =>
                 {
-                    b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Item", b =>
-                {
-                    b.Navigation("Carts");
+                    b.Navigation("Order")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
-                    b.Navigation("Carts");
-
                     b.Navigation("Deliveries");
 
+                    b.Navigation("Items");
+
                     b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Tenant", b =>
+                {
+                    b.Navigation("Order")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

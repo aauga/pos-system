@@ -17,8 +17,15 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
         _mediator = mediator;
     }
-
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<Item> Items => Set<Item>();
+    public DbSet<Cart> Carts => Set<Cart>();
+    public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<Delivery> Deliveries => Set<Delivery>();
     public DbSet<Employee> Employees => Set<Employee>();
+    public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<User> Users => Set<User>();
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
