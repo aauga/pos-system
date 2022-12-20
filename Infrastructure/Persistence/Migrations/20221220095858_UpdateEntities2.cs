@@ -11,8 +11,16 @@ namespace Infrastructure.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
+                name: "FK_Customers_Tenants_TenantId",
+                table: "Customers");
+
+            migrationBuilder.DropForeignKey(
                 name: "FK_Items_Orders_OrderId",
                 table: "Items");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Orders_Tenants_TenantId",
+                table: "Orders");
 
             migrationBuilder.DropIndex(
                 name: "IX_Orders_CustomerId",
@@ -23,12 +31,28 @@ namespace Infrastructure.Persistence.Migrations
                 table: "Orders");
 
             migrationBuilder.DropIndex(
+                name: "IX_Orders_TenantId",
+                table: "Orders");
+
+            migrationBuilder.DropIndex(
                 name: "IX_Items_OrderId",
                 table: "Items");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Customers_TenantId",
+                table: "Customers");
+
+            migrationBuilder.DropColumn(
+                name: "TenantId",
+                table: "Orders");
 
             migrationBuilder.DropColumn(
                 name: "OrderId",
                 table: "Items");
+
+            migrationBuilder.DropColumn(
+                name: "TenantId",
+                table: "Customers");
 
             migrationBuilder.CreateTable(
                 name: "Carts",
@@ -116,8 +140,22 @@ namespace Infrastructure.Persistence.Migrations
                 table: "Employees");
 
             migrationBuilder.AddColumn<int>(
+                name: "TenantId",
+                table: "Orders",
+                type: "INTEGER",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.AddColumn<int>(
                 name: "OrderId",
                 table: "Items",
+                type: "INTEGER",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.AddColumn<int>(
+                name: "TenantId",
+                table: "Customers",
                 type: "INTEGER",
                 nullable: false,
                 defaultValue: 0);
@@ -135,15 +173,42 @@ namespace Infrastructure.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_TenantId",
+                table: "Orders",
+                column: "TenantId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Items_OrderId",
                 table: "Items",
                 column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customers_TenantId",
+                table: "Customers",
+                column: "TenantId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Customers_Tenants_TenantId",
+                table: "Customers",
+                column: "TenantId",
+                principalTable: "Tenants",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Items_Orders_OrderId",
                 table: "Items",
                 column: "OrderId",
                 principalTable: "Orders",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Orders_Tenants_TenantId",
+                table: "Orders",
+                column: "TenantId",
+                principalTable: "Tenants",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }

@@ -65,12 +65,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("Customers");
                 });
@@ -178,9 +173,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<decimal>("Tip")
                         .HasColumnType("TEXT");
 
@@ -192,9 +184,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("EmployeeId");
-
-                    b.HasIndex("TenantId")
-                        .IsUnique();
 
                     b.ToTable("Orders");
                 });
@@ -287,17 +276,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Customer", b =>
-                {
-                    b.HasOne("Domain.Entities.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
             modelBuilder.Entity("Domain.Entities.Delivery", b =>
                 {
                     b.HasOne("Domain.Entities.Order", "Order")
@@ -334,17 +312,9 @@ namespace Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Tenant", "Tenant")
-                        .WithOne("Order")
-                        .HasForeignKey("Domain.Entities.Order", "TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Customer");
 
                     b.Navigation("Employee");
-
-                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Domain.Entities.Payment", b =>
@@ -399,12 +369,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Deliveries");
 
                     b.Navigation("Payments");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Tenant", b =>
-                {
-                    b.Navigation("Order")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
