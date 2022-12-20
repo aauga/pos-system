@@ -14,7 +14,7 @@ public class Order : BaseEntity
     public decimal Tip { get; set; }
     public string? Delivery { get; set; }
     public DateTime Date { get; set; }
-    public IEnumerable<Item> Items { get; set; }
+    public IEnumerable<Cart> Carts { get; set; }
     public IEnumerable<Payment> Payments { get; set; }
     public IEnumerable<Delivery> Deliveries { get; set; }
 }

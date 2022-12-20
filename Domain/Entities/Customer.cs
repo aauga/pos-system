@@ -10,5 +10,5 @@ public class Customer : BaseEntity
     public string? Email { get; set; }
     public Tenant Tenant { get; set; }
     public int TenantId { get; set; }
-    public Order Order { get; set; }
+    public IEnumerable<Order> Orders { get; set; }
 }

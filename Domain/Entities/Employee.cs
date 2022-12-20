@@ -8,7 +8,8 @@ public class Employee : BaseEntity
     public string? LastName { get; set; }
     public string? PersonalCode { get; set; }
     public string? Email { get; set; }
+    public Tenant Tenant { get; set; }
     public int TenantId { get; set; }
     public int PositionId { get; set; }
-    public Order Order { get; set; }
+    public IEnumerable<Order> Orders { get; set; }
 }
