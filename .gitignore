@@ -367,3 +367,5 @@ FodyWeavers.xsd
 .idea/
 
 *.db
+/WebApi/appsettings.Development.json
+/WebApi/DB_LOCATION
