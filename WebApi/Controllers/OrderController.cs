@@ -1,6 +1,7 @@
 using Application.Orders;
 using Application.Deliveries;
 using Application.Payments;
+using Application.Carts;
 using CleanArchitecture.WebUI.Controllers;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -124,5 +125,17 @@ public class OrderController : ApiControllerBase
     public async Task<ActionResult<PaymentDTO>> AddOrderPayment(int id, [FromBody] PaymentBodyDTO deliveryBodyDTO)
     {
         return await Mediator.Send(new CreateOrderPaymentCommand(id, deliveryBodyDTO));
+    }
+
+    [HttpGet("{id}/Cart")]
+    public async Task<IEnumerable<CartDTO>> GetOrderCarts(int id)
+    {
+        return await Mediator.Send(new GetOrderCartsQuery(id));
+    }
+
+    [HttpPost("{id}/Cart")]
+    public async Task<ActionResult<CartDTO>> AddOrderCart(int id, [FromBody] CartItemIdDTO cartItemIdDTO)
+    {
+        return await Mediator.Send(new CreateOrderCartCommand(id, cartItemIdDTO));
     }
 }
