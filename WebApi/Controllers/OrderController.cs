@@ -29,7 +29,7 @@ public class OrderController : ApiControllerBase
     /// <response code="200">Order was found and returned.</response>
     /// <response code="404">Order was not found</response>
     [HttpGet("{id}")]
-    public async Task<ActionResult<OrderDTO>> GetOrder(int id, [FromQuery] GetOrderQuery query)
+    public async Task<ActionResult<OrderDTO>> GetOrder(int id)
     {
         return await Mediator.Send(new GetOrderQuery(id));
     }
