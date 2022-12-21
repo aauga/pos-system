@@ -1,4 +1,6 @@
 using Application.Orders;
+using Application.Deliveries;
+using Application.Payments;
 using CleanArchitecture.WebUI.Controllers;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -78,5 +80,49 @@ public class OrderController : ApiControllerBase
         await Mediator.Send(new DeleteOrderCommand(id));
         return Ok();
         
+    }
+
+    /// <summary>
+    /// Get all delivery identifiers for the specified order.
+    /// </summary>
+    /// <response code="200">List of identifiers was returned.</response>
+    /// <response code="404">Order was not found</response>
+    [HttpGet("{id}/Delivery")]
+    public async Task<IEnumerable<DeliveryDTO>> GetOrderDeliveries(int id)
+    {
+        return await Mediator.Send(new GetOrderDeliveryQuery(id));
+    }
+
+    /// <summary>
+    /// Create a new delivery of the order.
+    /// </summary>
+    /// <response code="200">Order delivery was created and returned.</response>
+    /// <response code="404">Order was not found</response>
+    [HttpPost("{id}/Delivery")]
+    public async Task<ActionResult<DeliveryDTO>> AddOrderDelivery(int id, [FromBody] DeliveryBodyDTO deliveryBodyDTO)
+    {
+        return await Mediator.Send(new CreateOrderDeliveryCommand(id, deliveryBodyDTO));
+    }
+
+    /// <summary>
+    /// Get all payment identifiers for the specified order.
+    /// </summary>
+    /// <response code="200">List of identifiers was returned.</response>
+    /// <response code="404">Order was not found</response>
+    [HttpGet("{id}/Payment")]
+    public async Task<IEnumerable<PaymentDTO>> GetOrderPayments(int id)
+    {
+        return await Mediator.Send(new GetOrderPaymentQuery(id));
+    }
+
+    /// <summary>
+    /// Create a new payment of the order.
+    /// </summary>
+    /// <response code="200">Order payment was created and returned.</response>
+    /// <response code="404">Order was not found</response>
+    [HttpPost("{id}/Payment")]
+    public async Task<ActionResult<PaymentDTO>> AddOrderPayment(int id, [FromBody] PaymentBodyDTO deliveryBodyDTO)
+    {
+        return await Mediator.Send(new CreateOrderPaymentCommand(id, deliveryBodyDTO));
     }
 }

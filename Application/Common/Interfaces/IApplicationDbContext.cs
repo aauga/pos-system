@@ -7,5 +7,8 @@ public interface IApplicationDbContext
 {
     DbSet<Employee> Employees { get; }
     DbSet<Order> Orders { get; }
+    DbSet<Cart> Carts { get; }
+    DbSet<Delivery> Deliveries { get; }
+    DbSet<Payment> Payments { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
