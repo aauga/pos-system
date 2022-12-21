@@ -127,12 +127,22 @@ public class OrderController : ApiControllerBase
         return await Mediator.Send(new CreateOrderPaymentCommand(id, deliveryBodyDTO));
     }
 
+    /// <summary>
+    /// Get list of item identifiers in the order cart.
+    /// </summary>
+    /// <response code="200">List of identifiers was returned.</response>
+    /// <response code="404">Order was not found</response>
     [HttpGet("{id}/Cart")]
     public async Task<IEnumerable<CartDTO>> GetOrderCarts(int id)
     {
         return await Mediator.Send(new GetOrderCartsQuery(id));
     }
 
+    /// <summary>
+    /// Create a new item cart for the order.
+    /// </summary>
+    /// <response code="200">Order payment was created and returned.</response>
+    /// <response code="404">Order was not found</response>
     [HttpPost("{id}/Cart")]
     public async Task<ActionResult<CartDTO>> AddOrderCart(int id, [FromBody] CartItemIdDTO cartItemIdDTO)
     {
