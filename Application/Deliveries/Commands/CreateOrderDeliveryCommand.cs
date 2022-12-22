@@ -3,7 +3,6 @@ using Application.Common.Interfaces;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Sockets;
 
 namespace Application.Deliveries;
 
@@ -30,7 +29,6 @@ public class CreateOrderDeliveryCommandHandler : IRequestHandler<CreateOrderDeli
 
         var entity = new Delivery
         {
-            Id = 0,
             OrderId = request.orderId,
             Address = request.deliveryBodyDTO.Address,
             PostCode = request.deliveryBodyDTO.PostCode,
@@ -42,7 +40,7 @@ public class CreateOrderDeliveryCommandHandler : IRequestHandler<CreateOrderDeli
 
         try
         {
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync();
         }
         catch (DbUpdateException)
         {

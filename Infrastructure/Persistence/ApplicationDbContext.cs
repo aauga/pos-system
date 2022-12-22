@@ -38,4 +38,9 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         await _mediator.DispatchDomainEvents(this);
         return await base.SaveChangesAsync(cancellationToken);
     }
+    public async Task<int> SaveChangesAsync()
+    {
+        await _mediator.DispatchDomainEvents(this);
+        return await base.SaveChangesAsync();
+    }
 }

@@ -30,7 +30,6 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
     {
         var entity = new Order
         {
-            Id = 0,
             CustomerId = request.CustomerId,
             EmployeeId = request.EmployeeId,
             Total = request.Total,
@@ -43,7 +42,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
 
         try
         {
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync();
         }
         catch (DbUpdateException)
         {

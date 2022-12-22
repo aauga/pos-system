@@ -30,7 +30,6 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
 
         var entity = new Payment
         {
-            Id = 0,
             OrderId = request.orderId,
             Provider = request.paymentBodyDTO.Provider,
             Status= request.paymentBodyDTO.Status
@@ -41,7 +40,7 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
 
         try
         {
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync();
         }
         catch (DbUpdateException)
         {

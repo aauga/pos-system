@@ -21,7 +21,7 @@ public class DeleteOrderCommandHandler : IRequestHandler<DeleteOrderCommand>
 
     public async Task<Unit> Handle(DeleteOrderCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Orders.FindAsync(new object[] { request.Id }, cancellationToken);
+        var entity = await _dbContext.Orders.FindAsync(request.Id);
 
         if (entity == null)
         {
@@ -31,7 +31,7 @@ public class DeleteOrderCommandHandler : IRequestHandler<DeleteOrderCommand>
 
         try
         {
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync();
         }
         catch (DbUpdateException)
         {

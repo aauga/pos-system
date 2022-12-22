@@ -29,14 +29,13 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
 
     public async Task<OrderDTO> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Orders.FindAsync(new object[] { request.Id }, cancellationToken);
+        var entity = await _dbContext.Orders.FindAsync(request.Id);
 
         if (entity == null)
         {
             throw new NotFoundException(nameof(Order), request.Id);
         }
 
-        //entity.Id = request.Id;
         entity.CustomerId = request.CustomerId;
         entity.EmployeeId = request.EmployeeId;
         entity.Total = request.Total;
@@ -46,7 +45,7 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
 
         try
         {
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync();
         }
         catch (DbUpdateException)
         {
@@ -55,13 +54,13 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
 
         var orderDTO = new OrderDTO
         {
-            Id = request.Id,
-            CustomerId = request.CustomerId,
-            EmployeeId = request.EmployeeId,
-            Total = request.Total,
-            Tip = request.Tip,
-            Delivery = request.Delivery,
-            Date = request.Date,
+            Id = entity.Id,
+            CustomerId = entity.CustomerId,
+            EmployeeId = entity.EmployeeId,
+            Total = entity.Total,
+            Tip = entity.Tip,
+            Delivery = entity.Delivery,
+            Date = entity.Date
         };
 
         return orderDTO;

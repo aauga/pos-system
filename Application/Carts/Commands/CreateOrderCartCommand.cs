@@ -21,7 +21,7 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
 
     public async Task<CartDTO> Handle(CreateOrderCartCommand request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.FindAsync(new object[] { request.orderId }, cancellationToken);
+        var order = await _dbContext.Orders.FindAsync(request.orderId);
 
         if (order == null)
         {
@@ -30,7 +30,6 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
 
         var entity = new Cart
         {
-            Id = 0,
             OrderId = request.orderId,
             ItemId = request.cartItemIdDTO.ItemId,
             Quantity = request.cartItemIdDTO.Quantity,
@@ -43,7 +42,7 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
 
         try
         {
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync();
         }
         catch (DbUpdateException)
         {
@@ -74,7 +73,7 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
 
         try
         {
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync();
         }
         catch (DbUpdateException)
         {
