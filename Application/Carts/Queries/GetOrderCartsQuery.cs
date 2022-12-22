@@ -22,20 +22,17 @@ public class GetOrderCartsQueryHandler : IRequestHandler<GetOrderCartsQuery, IEn
         var list = await _dbContext.Carts
             .Where(b => b.OrderId == request.orderId)
             .OrderBy(b => b.Id)
-            .ToListAsync();
-        var DTOList = new List<CartDTO>();
-        foreach (var item in list)
-        {
-            DTOList.Add(new CartDTO
+            .Select(item => new CartDTO
             {
                 Id = item.Id,
                 OrderId = item.OrderId,
-                ItemId= item.ItemId,
-                Quantity= item.Quantity,
-                Discount= item.Discount,
-                Description= item.Description
-            });
-        }
-        return DTOList;
+                ItemId = item.ItemId,
+                Quantity = item.Quantity,
+                Discount = item.Discount,
+                Description = item.Description
+            })
+            .ToListAsync();
+
+        return list;
     }
 }

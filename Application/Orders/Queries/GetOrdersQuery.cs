@@ -27,21 +27,18 @@ public class GetOrdersQueryHandler : IRequestHandler<GetOrdersQuery, IEnumerable
             .OrderBy(b => b.Id)
             .Skip(request.offset)
             .Take(request.limit)
-            .ToListAsync();
-        var DTOList = new List<OrderDTO>();
-        foreach (var item in list)
-        {
-            DTOList.Add(new OrderDTO
+            .Select(item => new OrderDTO
             {
                 Id = item.Id,
-                CustomerId= item.CustomerId,
-                EmployeeId= item.EmployeeId,
-                Total= item.Total,
-                Tip= item.Tip,
-                Delivery= item.Delivery,
-                Date= item.Date
-            });
-        }
-        return DTOList;
+                CustomerId = item.CustomerId,
+                EmployeeId = item.EmployeeId,
+                Total = item.Total,
+                Tip = item.Tip,
+                Delivery = item.Delivery,
+                Date = item.Date
+            })
+            .ToListAsync();
+       
+        return list;
     }
 }

@@ -29,19 +29,15 @@ public class GetOrderPaymentQueryHandler : IRequestHandler<GetOrderPaymentQuery,
 
         var list = await _dbContext.Payments
             .Where(b => b.OrderId == request.orderId)
-            .ToListAsync();
-
-        var DTOList = new List<PaymentDTO>();
-        foreach (var item in list)
-        {
-            DTOList.Add(new PaymentDTO
+            .Select(item => new PaymentDTO
             {
                 Id = item.Id,
-                OrderId= item.OrderId,
+                OrderId = item.OrderId,
                 Provider = item.Provider,
                 Status = item.Status
-            });
-        }
-        return DTOList;
+            })
+            .ToListAsync();
+
+        return list;
     }
 }

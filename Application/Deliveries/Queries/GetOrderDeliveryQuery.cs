@@ -29,20 +29,16 @@ public class GetOrderDeliveryQueryHandler : IRequestHandler<GetOrderDeliveryQuer
 
         var list = await _dbContext.Deliveries
             .Where(b => b.OrderId == request.orderId)
-            .ToListAsync();
-
-        var DTOList = new List<DeliveryDTO>();
-        foreach (var item in list)
-        {
-            DTOList.Add(new DeliveryDTO
+            .Select(item => new DeliveryDTO
             {
                 Id = item.Id,
-                OrderId= item.OrderId,
-                Address= item.Address,
-                PostCode= item.PostCode,
-                Details= item.Details
-            });
-        }
-        return DTOList;
+                OrderId = item.OrderId,
+                Address = item.Address,
+                PostCode = item.PostCode,
+                Details = item.Details
+            })
+            .ToListAsync();
+
+        return list;
     }
 }
