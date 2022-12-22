@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Exceptions;
+using Application.Common.Interfaces;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,13 @@ public class GetOrderCartsQueryHandler : IRequestHandler<GetOrderCartsQuery, IEn
 
     public async Task<IEnumerable<CartDTO>> Handle(GetOrderCartsQuery request, CancellationToken cancellationToken)
     {
+        var order = await _dbContext.Orders.FindAsync(request.orderId);
+
+        if (order == null)
+        {
+            throw new NotFoundException(nameof(Order), request.orderId);
+        }
+
         var list = await _dbContext.Carts
             .Where(b => b.OrderId == request.orderId)
             .OrderBy(b => b.Id)

@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Orders;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,16 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
             throw new NotFoundException(nameof(Order), request.orderId);
         }
 
+        var cart = await _dbContext.Carts
+            .Where(b => b.OrderId == request.orderId && b.ItemId == request.cartItemIdDTO.ItemId)
+            .ToListAsync();
+             //.SingleAsync(b => b.OrderId == request.orderId && b.ItemId == request.cartItemIdDTO.ItemId);
+
+        if (cart.Count != 0)
+        {
+            throw new ForbiddenAccessException();
+        }
+
         var entity = new Cart
         {
             OrderId = request.orderId,
@@ -37,7 +48,6 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
             Description = request.cartItemIdDTO.Description
         };
         
-
         _dbContext.Carts.Add(entity);
 
         try
@@ -48,39 +58,8 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
         {
             throw new ForbiddenAccessException();
         }
-
-        var carts = _dbContext.Carts
-            .Where(b => b.OrderId == request.orderId)
-            .ToList();
-
-        decimal total = 0;
-
-        foreach (var cart in carts)
-        {
-            var item = _dbContext.Items
-                .Single(b => b.Id == cart.ItemId);
-            if (cart.Discount == 0)
-            {
-                total += item.Price * (decimal)cart.Quantity;
-            }
-            else
-            {
-                total += item.Price * (decimal)cart.Quantity / cart.Discount;
-            }
-        }
-
-        order.Total = total;
-
-        try
-        {
-            await _dbContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException)
-        {
-            throw new ForbiddenAccessException();
-        }
-
-        var deliveryDTO = new CartDTO
+        
+        var cartDTO = new CartDTO
         {
             Id = entity.Id,
             OrderId = entity.OrderId,
@@ -90,6 +69,6 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
             Description = entity.Description
         };
 
-        return deliveryDTO;
+        return cartDTO;
     }
 }

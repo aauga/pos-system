@@ -9,7 +9,6 @@ namespace Application.Orders;
 
 public record DeleteOrderCommand (int Id) : IRequest;
 
-
 public class DeleteOrderCommandHandler : IRequestHandler<DeleteOrderCommand>
 {
     private readonly IApplicationDbContext _dbContext;

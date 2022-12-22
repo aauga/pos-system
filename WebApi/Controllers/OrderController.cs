@@ -84,6 +84,68 @@ public class OrderController : ApiControllerBase
     }
 
     /// <summary>
+    /// Get list of item identifiers in the order cart.
+    /// </summary>
+    /// <response code="200">List of identifiers was returned.</response>
+    /// <response code="404">Order was not found.</response>
+    [HttpGet("{id}/Cart")]
+    public async Task<IEnumerable<CartDTO>> GetOrderCarts(int id)
+    {
+        return await Mediator.Send(new GetOrderCartsQuery(id));
+    }
+
+    /// <summary>
+    /// Create a new item cart for the order.
+    /// </summary>
+    /// <response code="200">Order payment was created and returned.</response>
+    /// <response code="403">Order cart for specified item already exists.</response>
+    /// <response code="404">Order was not found.</response>
+    [HttpPost("{id}/Cart")]
+    public async Task<ActionResult<CartDTO>> AddOrderCart(int id, [FromBody] CartItemIdDTO cartItemIdDTO)
+    {
+        var cart = await Mediator.Send(new CreateOrderCartCommand(id, cartItemIdDTO));
+        await Mediator.Send(new UpdateOrderTotalCommand(id));
+        return cart;
+    }
+
+    /// <summary>
+    /// Get information about an item in the order cart.
+    /// </summary>
+    /// <response code="200">Cart information was found and returned.</response>
+    /// <response code="404">Cart with order and item identifier combination was not found.</response>
+    [HttpGet("{orderId}/Cart/{itemId}")]
+    public async Task<ActionResult<CartDTO>> GetOrderCart(int orderId, int itemId)
+    {
+        return await Mediator.Send(new GetOrderCartQuery(orderId, itemId));
+    }
+
+    /// <summary>
+    /// Replace existing cart information.
+    /// </summary>
+    /// <response code="200">Cart information was replaced and returned.</response>
+    /// <response code="404">Cart with order and item identifier combination was not found.</response>
+    [HttpPut("{orderId}/Cart/{itemId}")]
+    public async Task<ActionResult<CartDTO>> UpdateOrderCart(int orderId, int itemId, [FromBody] CartBodyDTO cartBodyDTO)
+    {
+        var cart = await Mediator.Send(new UpdateOrderCartCommand(orderId, itemId, cartBodyDTO));
+        await Mediator.Send(new UpdateOrderTotalCommand(orderId));
+        return cart;
+    }
+
+    /// <summary>
+    /// Delete existing cart information.
+    /// </summary>
+    /// <response code="200">Cart information was deleted.</response>
+    /// <response code="404">Cart with order and item identifier combination was not found.</response>
+    [HttpDelete("{orderId}/Cart/{itemId}")]
+    public async Task<ActionResult<CartDTO>> DeleteOrderCart(int orderId, int itemId)
+    {
+        var cart = await Mediator.Send(new DeleteOrderCartCommand(orderId, itemId));
+        await Mediator.Send(new UpdateOrderTotalCommand(orderId));
+        return Ok();
+    }
+
+    /// <summary>
     /// Get all delivery identifiers for the specified order.
     /// </summary>
     /// <response code="200">List of identifiers was returned.</response>
@@ -125,27 +187,5 @@ public class OrderController : ApiControllerBase
     public async Task<ActionResult<PaymentDTO>> AddOrderPayment(int id, [FromBody] PaymentBodyDTO deliveryBodyDTO)
     {
         return await Mediator.Send(new CreateOrderPaymentCommand(id, deliveryBodyDTO));
-    }
-
-    /// <summary>
-    /// Get list of item identifiers in the order cart.
-    /// </summary>
-    /// <response code="200">List of identifiers was returned.</response>
-    /// <response code="404">Order was not found</response>
-    [HttpGet("{id}/Cart")]
-    public async Task<IEnumerable<CartDTO>> GetOrderCarts(int id)
-    {
-        return await Mediator.Send(new GetOrderCartsQuery(id));
-    }
-
-    /// <summary>
-    /// Create a new item cart for the order.
-    /// </summary>
-    /// <response code="200">Order payment was created and returned.</response>
-    /// <response code="404">Order was not found</response>
-    [HttpPost("{id}/Cart")]
-    public async Task<ActionResult<CartDTO>> AddOrderCart(int id, [FromBody] CartItemIdDTO cartItemIdDTO)
-    {
-        return await Mediator.Send(new CreateOrderCartCommand(id, cartItemIdDTO));
     }
 }
