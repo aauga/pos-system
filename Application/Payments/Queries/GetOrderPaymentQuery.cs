@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Payments;
 
-public record GetOrderPaymentQuery (int orderId) : IRequest<IEnumerable<PaymentDTO>>;
+public record GetOrderPaymentQuery (int orderId) : IRequest<IEnumerable<PaymentDto>>;
 
 
-public class GetOrderPaymentQueryHandler : IRequestHandler<GetOrderPaymentQuery, IEnumerable<PaymentDTO>>
+public class GetOrderPaymentQueryHandler : IRequestHandler<GetOrderPaymentQuery, IEnumerable<PaymentDto>>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -18,7 +18,7 @@ public class GetOrderPaymentQueryHandler : IRequestHandler<GetOrderPaymentQuery,
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<PaymentDTO>> Handle(GetOrderPaymentQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<PaymentDto>> Handle(GetOrderPaymentQuery request, CancellationToken cancellationToken)
     {
         var order = await _dbContext.Orders.FindAsync(request.orderId);
 
@@ -29,7 +29,7 @@ public class GetOrderPaymentQueryHandler : IRequestHandler<GetOrderPaymentQuery,
 
         var list = await _dbContext.Payments
             .Where(b => b.OrderId == request.orderId)
-            .Select(item => new PaymentDTO
+            .Select(item => new PaymentDto
             {
                 Id = item.Id,
                 OrderId = item.OrderId,

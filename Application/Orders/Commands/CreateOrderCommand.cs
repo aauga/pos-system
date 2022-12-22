@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders;
 
-public class CreateOrderCommand : IRequest<OrderDTO>
+public class CreateOrderCommand : IRequest<OrderDto>
 {
     //public int Id { get; init; }
     public int CustomerId { get; init; }
@@ -17,7 +17,7 @@ public class CreateOrderCommand : IRequest<OrderDTO>
     public DateTime Date { get; init; }
 }
 
-public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, OrderDTO>
+public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, OrderDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -26,7 +26,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
         _dbContext = dbContext;
     }
 
-    public async Task<OrderDTO> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<OrderDto> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
         var entity = new Order
         {
@@ -49,7 +49,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
             throw new ForbiddenAccessException();
         }
 
-        var orderDTO = new OrderDTO
+        var orderDto = new OrderDto
         {
             Id = entity.Id,
             CustomerId = entity.CustomerId,
@@ -60,6 +60,6 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
             Date = entity.Date,
         };
 
-        return orderDTO;
+        return orderDto;
     }
 }

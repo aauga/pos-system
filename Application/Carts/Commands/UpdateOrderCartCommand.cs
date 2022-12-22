@@ -8,10 +8,10 @@ using System.Net.Sockets;
 
 namespace Application.Carts;
 
-public record UpdateOrderCartCommand(int orderId, int itemId, CartBodyDTO cartBodyDTO) : IRequest<CartDTO>;
+public record UpdateOrderCartCommand(int orderId, int itemId, CartBodyDto cartBodyDto) : IRequest<CartDto>;
 
 
-public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartCommand, CartDTO>
+public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartCommand, CartDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -20,7 +20,7 @@ public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartComm
         _dbContext = dbContext;
     }
 
-    public async Task<CartDTO> Handle(UpdateOrderCartCommand request, CancellationToken cancellationToken)
+    public async Task<CartDto> Handle(UpdateOrderCartCommand request, CancellationToken cancellationToken)
     {
         var entity = await _dbContext.Carts
              .SingleAsync(b => b.OrderId == request.orderId && b.ItemId == request.itemId);
@@ -30,9 +30,9 @@ public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartComm
             throw new NotFoundException(nameof(Order), request.orderId);
         }
 
-        entity.Quantity = request.cartBodyDTO.Quantity;
-        entity.Discount = request.cartBodyDTO.Discount;
-        entity.Description = request.cartBodyDTO.Description;
+        entity.Quantity = request.cartBodyDto.Quantity;
+        entity.Discount = request.cartBodyDto.Discount;
+        entity.Description = request.cartBodyDto.Description;
 
         try
         {
@@ -43,7 +43,7 @@ public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartComm
             throw new ForbiddenAccessException();
         }
         
-        var cartDTO = new CartDTO
+        var cartDto = new CartDto
         {
             Id = entity.Id,
             OrderId = entity.OrderId,
@@ -53,6 +53,6 @@ public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartComm
             Description = entity.Description
         };
 
-        return cartDTO;
+        return cartDto;
     }
 }

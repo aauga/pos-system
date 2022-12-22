@@ -5,9 +5,9 @@ using MediatR;
 
 namespace Application.Orders;
 
-public record GetOrderQuery(int id) : IRequest<OrderDTO>;
+public record GetOrderQuery(int id) : IRequest<OrderDto>;
 
-public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, OrderDTO>
+public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, OrderDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -16,7 +16,7 @@ public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, OrderDTO>
         _dbContext = dbContext;
     }
 
-    public async Task<OrderDTO> Handle(GetOrderQuery request, CancellationToken cancellationToken)
+    public async Task<OrderDto> Handle(GetOrderQuery request, CancellationToken cancellationToken)
     {
         var order = await _dbContext.Orders.FindAsync(request.id);
 
@@ -25,7 +25,7 @@ public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, OrderDTO>
             throw new NotFoundException(nameof(Order), request.id);
         }
         
-        var orderDTO = new OrderDTO
+        var orderDto = new OrderDto
         {
             Id = order.Id,
             CustomerId = order.CustomerId,
@@ -36,6 +36,6 @@ public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, OrderDTO>
             Date = order.Date
         };
 
-        return orderDTO;
+        return orderDto;
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Application.Carts;
 
-public class CartBodyDTO
+public class CartBodyDto
 {
     public int Quantity { get; set; }
     public decimal Discount { get; set; }

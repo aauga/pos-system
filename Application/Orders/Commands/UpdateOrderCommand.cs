@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders;
 
-public class UpdateOrderCommand : IRequest<OrderDTO>
+public class UpdateOrderCommand : IRequest<OrderDto>
 {
     public int Id { get; init; }
     public int CustomerId { get; init; }
@@ -18,7 +18,7 @@ public class UpdateOrderCommand : IRequest<OrderDTO>
     public DateTime Date { get; init; }
 }
 
-public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, OrderDTO>
+public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, OrderDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -27,7 +27,7 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
         _dbContext = dbContext;
     }
 
-    public async Task<OrderDTO> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<OrderDto> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
     {
         var entity = await _dbContext.Orders.FindAsync(request.Id);
 
@@ -52,7 +52,7 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
             throw new ForbiddenAccessException();
         }
 
-        var orderDTO = new OrderDTO
+        var orderDto = new OrderDto
         {
             Id = entity.Id,
             CustomerId = entity.CustomerId,
@@ -63,6 +63,6 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
             Date = entity.Date
         };
 
-        return orderDTO;
+        return orderDto;
     }
 }

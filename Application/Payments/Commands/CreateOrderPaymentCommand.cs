@@ -7,10 +7,10 @@ using System.Net.Sockets;
 
 namespace Application.Payments;
 
-public record CreateOrderPaymentCommand (int orderId, PaymentBodyDTO paymentBodyDTO) : IRequest<PaymentDTO>;
+public record CreateOrderPaymentCommand (int orderId, PaymentBodyDto paymentBodyDto) : IRequest<PaymentDto>;
 
 
-public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPaymentCommand, PaymentDTO>
+public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPaymentCommand, PaymentDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -19,7 +19,7 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
         _dbContext = dbContext;
     }
 
-    public async Task<PaymentDTO> Handle(CreateOrderPaymentCommand request, CancellationToken cancellationToken)
+    public async Task<PaymentDto> Handle(CreateOrderPaymentCommand request, CancellationToken cancellationToken)
     {
         var order = await _dbContext.Orders.FindAsync(request.orderId);
 
@@ -31,8 +31,8 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
         var entity = new Payment
         {
             OrderId = request.orderId,
-            Provider = request.paymentBodyDTO.Provider,
-            Status= request.paymentBodyDTO.Status
+            Provider = request.paymentBodyDto.Provider,
+            Status= request.paymentBodyDto.Status
         };
         
 
@@ -47,14 +47,14 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
             throw new ForbiddenAccessException();
         }
 
-        var deliveryDTO = new PaymentDTO
+        var deliveryDto = new PaymentDto
         {
             Id = entity.Id,
             OrderId = entity.OrderId,
-            Provider = request.paymentBodyDTO.Provider,
-            Status = request.paymentBodyDTO.Status
+            Provider = request.paymentBodyDto.Provider,
+            Status = request.paymentBodyDto.Status
         };
 
-        return deliveryDTO;
+        return deliveryDto;
     }
 }

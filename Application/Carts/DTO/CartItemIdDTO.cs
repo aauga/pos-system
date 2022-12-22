@@ -1,6 +1,6 @@
 ﻿namespace Application.Carts;
 
-public class CartItemIdDTO
+public class CartItemIdDto
 {
     public int ItemId { get; set; }
     public int Quantity { get; set; }

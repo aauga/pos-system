@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Carts;
 
-public record GetOrderCartsQuery (int orderId) : IRequest<IEnumerable<CartDTO>>;
+public record GetOrderCartsQuery (int orderId) : IRequest<IEnumerable<CartDto>>;
 
 
-public class GetOrderCartsQueryHandler : IRequestHandler<GetOrderCartsQuery, IEnumerable<CartDTO>>
+public class GetOrderCartsQueryHandler : IRequestHandler<GetOrderCartsQuery, IEnumerable<CartDto>>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -18,7 +18,7 @@ public class GetOrderCartsQueryHandler : IRequestHandler<GetOrderCartsQuery, IEn
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<CartDTO>> Handle(GetOrderCartsQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<CartDto>> Handle(GetOrderCartsQuery request, CancellationToken cancellationToken)
     {
         var order = await _dbContext.Orders.FindAsync(request.orderId);
 
@@ -30,7 +30,7 @@ public class GetOrderCartsQueryHandler : IRequestHandler<GetOrderCartsQuery, IEn
         var list = await _dbContext.Carts
             .Where(b => b.OrderId == request.orderId)
             .OrderBy(b => b.Id)
-            .Select(item => new CartDTO
+            .Select(item => new CartDto
             {
                 Id = item.Id,
                 OrderId = item.OrderId,

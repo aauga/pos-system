@@ -1,6 +1,6 @@
 ﻿namespace Application.Deliveries;
 
-public class DeliveryDTO
+public class DeliveryDto
 {
     public int Id { get; set; }
     public int OrderId { get; set; }

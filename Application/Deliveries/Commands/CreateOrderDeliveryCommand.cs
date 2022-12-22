@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Deliveries;
 
-public record CreateOrderDeliveryCommand(int orderId, DeliveryBodyDTO deliveryBodyDTO) : IRequest<DeliveryDTO>;
+public record CreateOrderDeliveryCommand(int orderId, DeliveryBodyDto deliveryBodyDto) : IRequest<DeliveryDto>;
 
 
-public class CreateOrderDeliveryCommandHandler : IRequestHandler<CreateOrderDeliveryCommand, DeliveryDTO>
+public class CreateOrderDeliveryCommandHandler : IRequestHandler<CreateOrderDeliveryCommand, DeliveryDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -18,7 +18,7 @@ public class CreateOrderDeliveryCommandHandler : IRequestHandler<CreateOrderDeli
         _dbContext = dbContext;
     }
 
-    public async Task<DeliveryDTO> Handle(CreateOrderDeliveryCommand request, CancellationToken cancellationToken)
+    public async Task<DeliveryDto> Handle(CreateOrderDeliveryCommand request, CancellationToken cancellationToken)
     {
         var order = await _dbContext.Orders.FindAsync(request.orderId);
 
@@ -30,9 +30,9 @@ public class CreateOrderDeliveryCommandHandler : IRequestHandler<CreateOrderDeli
         var entity = new Delivery
         {
             OrderId = request.orderId,
-            Address = request.deliveryBodyDTO.Address,
-            PostCode = request.deliveryBodyDTO.PostCode,
-            Details= request.deliveryBodyDTO.Details
+            Address = request.deliveryBodyDto.Address,
+            PostCode = request.deliveryBodyDto.PostCode,
+            Details= request.deliveryBodyDto.Details
         };
         
 
@@ -47,7 +47,7 @@ public class CreateOrderDeliveryCommandHandler : IRequestHandler<CreateOrderDeli
             throw new ForbiddenAccessException();
         }
 
-        var deliveryDTO = new DeliveryDTO
+        var deliveryDto = new DeliveryDto
         {
             Id = entity.Id,
             OrderId = entity.OrderId,
@@ -56,6 +56,6 @@ public class CreateOrderDeliveryCommandHandler : IRequestHandler<CreateOrderDeli
             Details = entity.Details
         };
 
-        return deliveryDTO;
+        return deliveryDto;
     }
 }

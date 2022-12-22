@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Carts;
 
-public record GetOrderCartQuery (int orderId, int itemId) : IRequest<CartDTO>;
+public record GetOrderCartQuery (int orderId, int itemId) : IRequest<CartDto>;
 
 
-public class GetOrderCartQueryHandler : IRequestHandler<GetOrderCartQuery, CartDTO>
+public class GetOrderCartQueryHandler : IRequestHandler<GetOrderCartQuery, CartDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -18,7 +18,7 @@ public class GetOrderCartQueryHandler : IRequestHandler<GetOrderCartQuery, CartD
         _dbContext = dbContext;
     }
 
-    public async Task<CartDTO> Handle(GetOrderCartQuery request, CancellationToken cancellationToken)
+    public async Task<CartDto> Handle(GetOrderCartQuery request, CancellationToken cancellationToken)
     {
         var cart = await _dbContext.Carts
             .SingleAsync(b => b.OrderId == request.orderId && b.ItemId == request.itemId);
@@ -28,7 +28,7 @@ public class GetOrderCartQueryHandler : IRequestHandler<GetOrderCartQuery, CartD
             throw new NotFoundException(nameof(Cart));
         }
 
-        var cartDTO = new CartDTO
+        var cartDto = new CartDto
         {
             Id = cart.Id,
             OrderId = request.orderId,
@@ -38,6 +38,6 @@ public class GetOrderCartQueryHandler : IRequestHandler<GetOrderCartQuery, CartD
             Description = cart.Description
         };
 
-        return cartDTO;
+        return cartDto;
     }
 }

@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders;
 
-public class GetOrdersQuery : IRequest<IEnumerable<OrderDTO>>
+public class GetOrdersQuery : IRequest<IEnumerable<OrderDto>>
 {
     public int offset { get; init; } = 0;
     public int limit { get; init; } = 20;
     //public int? TenantId { get; init; }
 }
 
-public class GetOrdersQueryHandler : IRequestHandler<GetOrdersQuery, IEnumerable<OrderDTO>>
+public class GetOrdersQueryHandler : IRequestHandler<GetOrdersQuery, IEnumerable<OrderDto>>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -21,13 +21,13 @@ public class GetOrdersQueryHandler : IRequestHandler<GetOrdersQuery, IEnumerable
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<OrderDTO>> Handle(GetOrdersQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<OrderDto>> Handle(GetOrdersQuery request, CancellationToken cancellationToken)
     {
         var list = await _dbContext.Orders
             .OrderBy(b => b.Id)
             .Skip(request.offset)
             .Take(request.limit)
-            .Select(item => new OrderDTO
+            .Select(item => new OrderDto
             {
                 Id = item.Id,
                 CustomerId = item.CustomerId,

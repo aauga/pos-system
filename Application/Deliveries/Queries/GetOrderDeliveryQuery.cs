@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Deliveries;
 
-public record GetOrderDeliveryQuery (int orderId) : IRequest<IEnumerable<DeliveryDTO>>;
+public record GetOrderDeliveryQuery (int orderId) : IRequest<IEnumerable<DeliveryDto>>;
 
 
-public class GetOrderDeliveryQueryHandler : IRequestHandler<GetOrderDeliveryQuery, IEnumerable<DeliveryDTO>>
+public class GetOrderDeliveryQueryHandler : IRequestHandler<GetOrderDeliveryQuery, IEnumerable<DeliveryDto>>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -18,7 +18,7 @@ public class GetOrderDeliveryQueryHandler : IRequestHandler<GetOrderDeliveryQuer
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<DeliveryDTO>> Handle(GetOrderDeliveryQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<DeliveryDto>> Handle(GetOrderDeliveryQuery request, CancellationToken cancellationToken)
     {
         var order = await _dbContext.Orders.FindAsync(request.orderId);
 
@@ -29,7 +29,7 @@ public class GetOrderDeliveryQueryHandler : IRequestHandler<GetOrderDeliveryQuer
 
         var list = await _dbContext.Deliveries
             .Where(b => b.OrderId == request.orderId)
-            .Select(item => new DeliveryDTO
+            .Select(item => new DeliveryDto
             {
                 Id = item.Id,
                 OrderId = item.OrderId,

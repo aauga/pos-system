@@ -8,10 +8,10 @@ using System.Net.Sockets;
 
 namespace Application.Carts;
 
-public record CreateOrderCartCommand(int orderId, CartItemIdDTO cartItemIdDTO) : IRequest<CartDTO>;
+public record CreateOrderCartCommand(int orderId, CartItemIdDto cartItemIdDto) : IRequest<CartDto>;
 
 
-public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartCommand, CartDTO>
+public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartCommand, CartDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -20,7 +20,7 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
         _dbContext = dbContext;
     }
 
-    public async Task<CartDTO> Handle(CreateOrderCartCommand request, CancellationToken cancellationToken)
+    public async Task<CartDto> Handle(CreateOrderCartCommand request, CancellationToken cancellationToken)
     {
         var order = await _dbContext.Orders.FindAsync(request.orderId);
 
@@ -30,9 +30,9 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
         }
 
         var cart = await _dbContext.Carts
-            .Where(b => b.OrderId == request.orderId && b.ItemId == request.cartItemIdDTO.ItemId)
+            .Where(b => b.OrderId == request.orderId && b.ItemId == request.cartItemIdDto.ItemId)
             .ToListAsync();
-             //.SingleAsync(b => b.OrderId == request.orderId && b.ItemId == request.cartItemIdDTO.ItemId);
+             //.SingleAsync(b => b.OrderId == request.orderId && b.ItemId == request.cartItemIdDto.ItemId);
 
         if (cart.Count != 0)
         {
@@ -42,10 +42,10 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
         var entity = new Cart
         {
             OrderId = request.orderId,
-            ItemId = request.cartItemIdDTO.ItemId,
-            Quantity = request.cartItemIdDTO.Quantity,
-            Discount = request.cartItemIdDTO.Discount,
-            Description = request.cartItemIdDTO.Description
+            ItemId = request.cartItemIdDto.ItemId,
+            Quantity = request.cartItemIdDto.Quantity,
+            Discount = request.cartItemIdDto.Discount,
+            Description = request.cartItemIdDto.Description
         };
         
         _dbContext.Carts.Add(entity);
@@ -59,7 +59,7 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
             throw new ForbiddenAccessException();
         }
         
-        var cartDTO = new CartDTO
+        var cartDto = new CartDto
         {
             Id = entity.Id,
             OrderId = entity.OrderId,
@@ -69,6 +69,6 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
             Description = entity.Description
         };
 
-        return cartDTO;
+        return cartDto;
     }
 }

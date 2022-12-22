@@ -1,6 +1,6 @@
 ﻿namespace Application.Carts;
 
-public class CartDTO
+public class CartDto
 {
     public int Id { get; set; }
     public int OrderId { get; set; }

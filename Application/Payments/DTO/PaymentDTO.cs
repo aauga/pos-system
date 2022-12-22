@@ -1,6 +1,6 @@
 ﻿namespace Application.Payments;
 
-public class PaymentDTO
+public class PaymentDto
 {
     public int Id { get; set; }
     public int OrderId { get; set; }
