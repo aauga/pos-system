@@ -1,7 +1,7 @@
 using Application.Employees;
-using CleanArchitecture.WebUI.Controllers;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using WebUI.Controllers;
 
 namespace WebApi.Controllers;
 
