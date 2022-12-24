@@ -1,7 +1,9 @@
 using Application;
+using FluentValidation.AspNetCore;
 using Infrastructure;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using WebAPI.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,13 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+
+builder.Services.AddControllers(options => {
+    options.Filters.Add<ApiExceptionFilterAttribute>();
+});
+
+builder.Services.AddFluentValidationAutoValidation()
+    .AddFluentValidationClientsideAdapters();
 
 var app = builder.Build();
 
