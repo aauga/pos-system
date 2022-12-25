@@ -4,7 +4,8 @@ namespace Domain.Entities;
 
 public class Tenant : BaseEntity
 {
-    public string? Name { get; set; }
+    public string Name { get; set; }
     public DateTime ActiveFrom { get; set; }
     public DateTime ActiveTo { get; set; }
+    public IEnumerable<Employee> Employees { get; set; }
 }
