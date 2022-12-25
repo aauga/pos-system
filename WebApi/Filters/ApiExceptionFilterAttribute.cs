@@ -31,6 +31,7 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
     private void HandleException(ExceptionContext context)
     {
         Type type = context.Exception.GetType();
+
         if (_exceptionHandlers.ContainsKey(type))
         {
             _exceptionHandlers[type].Invoke(context);
@@ -42,6 +43,8 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
             HandleInvalidModelStateException(context);
             return;
         }
+
+        HandleUnhandledException(context);
     }
 
     private void HandleInvalidModelStateException(ExceptionContext context)
@@ -58,7 +61,7 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
 
     private void HandleNotFoundException(ExceptionContext context)
     {
-        var exception = (NotFoundException)context.Exception;
+        var exception = (NotFoundException) context.Exception;
 
         var details = new ProblemDetails()
         {
@@ -116,6 +119,23 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
         };
 
         context.Result = new BadRequestObjectResult(details);
+        context.ExceptionHandled = true;
+    }
+
+    private void HandleUnhandledException(ExceptionContext context)
+    {
+        var details = new ProblemDetails
+        {
+            Status = StatusCodes.Status500InternalServerError,
+            Title = "Internal Server Error",
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
+        };
+
+        context.Result = new ObjectResult(details)
+        {
+            StatusCode = StatusCodes.Status500InternalServerError
+        };
+
         context.ExceptionHandled = true;
     }
 }
