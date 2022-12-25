@@ -1,5 +1,5 @@
 using Application.Tenants.Commands.CreateTenantCommand;
-using Domain.Entities;
+using Application.Tenants.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using WebUI.Controllers;
 
@@ -8,7 +8,7 @@ namespace WebApi.Controllers;
 public class TenantsController : ApiControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<Tenant>> Create(CreateTenantCommand command)
+    public async Task<ActionResult<TenantDto>> Create(CreateTenantCommand command)
     {
         var result = await Mediator.Send(command);
         return Created(result);

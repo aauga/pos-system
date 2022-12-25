@@ -1,8 +1,5 @@
-using Domain.Common;
 using MediatR;
-
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.Filters;
 
 namespace WebUI.Controllers;
 
@@ -17,7 +14,7 @@ public abstract class ApiControllerBase : ControllerBase
     public CreatedResult Created(object? value)
     {
         var request = HttpContext.Request;
-        var id = (value as BaseEntity)?.Id;
+        var id = (value as BaseDto)?.Id;
 
         var uri = string.Format("{0}://{1}{2}/{3}",
             request.Scheme,
