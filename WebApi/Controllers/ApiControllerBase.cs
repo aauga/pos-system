@@ -11,7 +11,7 @@ public abstract class ApiControllerBase : ControllerBase
 
     protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 
-    public CreatedResult Created(object? value)
+    internal CreatedResult Created(object? value)
     {
         var request = HttpContext.Request;
         var id = (value as BaseDto)?.Id;
