@@ -10,6 +10,15 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using WebAPI.Filters;
+using Application.Orders.Commands.CreateOrderCommand;
+using Application.Carts.Commands.CreateOrderCartCommand;
+using Application.Carts.Commands.UpdateOrderCartCommand;
+using Application.Carts.Commands.DeleteOrderCartCommand;
+using Application.Orders.Commands.UpdateOrderCommand;
+using Application.Orders.Commands.DeleteOrderCommand;
+using Application.Orders.Commands.UpdateOrderCartTotalCommand;
+using Application.Deliveries.Commands.CreateOrderDeliveryCommand;
+using Application.Payments.Commands.CreateOrderPaymentCommand;
 using Swashbuckle.AspNetCore.Annotations;
 using Application.Common.Attributes;
 
@@ -33,16 +42,22 @@ public class OrderController : ApiControllerBase
     }
 
     [HttpPost]
+    public async Task<ActionResult<OrderDto>> Create([FromBody] OrderBodyDto orderBodyDto)
     [Summary("Create a new order.")]
     public async Task<ActionResult<OrderDto>> Create(CreateOrderCommand command)
     {
-        return await Mediator.Send(command);
+        var order = await Mediator.Send(new CreateOrderCommand(orderBodyDto));
+        return Created(order);
     }
 
     [HttpPut("{id}")]
+    public async Task<ActionResult<OrderDto>> Update(int id, [FromBody] OrderBodyDto orderBodyDto)
     [Summary("Replace existing information about an order.")]
     public async Task<ActionResult<OrderDto>> Update(int id, UpdateOrderCommand command)
     {
+        return await Mediator.Send(new UpdateOrderCommand(id, orderBodyDto));
+
+        //return NoContent();
         if (id != command.Id)
         {
             return BadRequest();
@@ -73,7 +88,7 @@ public class OrderController : ApiControllerBase
     {
         var cart = await Mediator.Send(new CreateOrderCartCommand(id, cartItemIdDto));
         await Mediator.Send(new UpdateOrderTotalCommand(id));
-        return cart;
+        return Created(cart);
     }
 
     [HttpGet("{orderId}/Cart/{itemId}")]
@@ -112,7 +127,8 @@ public class OrderController : ApiControllerBase
     [Summary("Create a new delivery of the order.")]
     public async Task<ActionResult<DeliveryDto>> AddOrderDelivery(int id, [FromBody] DeliveryBodyDto deliveryBodyDto)
     {
-        return await Mediator.Send(new CreateOrderDeliveryCommand(id, deliveryBodyDto));
+        var delivery = await Mediator.Send(new CreateOrderDeliveryCommand(id, deliveryBodyDto));
+        return Created(delivery);
     }
 
     [HttpGet("{id}/Payment")]
@@ -126,6 +142,7 @@ public class OrderController : ApiControllerBase
     [Summary("Create a new payment of the order")]
     public async Task<ActionResult<PaymentDto>> AddOrderPayment(int id, [FromBody] PaymentBodyDto deliveryBodyDto)
     {
-        return await Mediator.Send(new CreateOrderPaymentCommand(id, deliveryBodyDto));
+        var payment = await Mediator.Send(new CreateOrderPaymentCommand(id, deliveryBodyDto));
+        return Created(payment);
     }
 }

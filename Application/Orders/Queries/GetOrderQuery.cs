@@ -24,17 +24,8 @@ public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, OrderDto>
         {
             throw new NotFoundException(nameof(Order), request.id);
         }
-        
-        var orderDto = new OrderDto
-        {
-            Id = order.Id,
-            CustomerId = order.CustomerId,
-            EmployeeId = order.EmployeeId,
-            Total = order.Total,
-            Tip = order.Tip,
-            Delivery = order.Delivery,
-            Date = order.Date
-        };
+
+        var orderDto = new OrderDto(order);
 
         return orderDto;
     }
