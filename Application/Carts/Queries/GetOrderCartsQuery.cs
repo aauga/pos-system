@@ -30,15 +30,7 @@ public class GetOrderCartsQueryHandler : IRequestHandler<GetOrderCartsQuery, IEn
         var list = await _dbContext.Carts
             .Where(b => b.OrderId == request.orderId)
             .OrderBy(b => b.Id)
-            .Select(item => new CartDto
-            {
-                Id = item.Id,
-                OrderId = item.OrderId,
-                ItemId = item.ItemId,
-                Quantity = item.Quantity,
-                Discount = item.Discount,
-                Description = item.Description
-            })
+            .Select(cart => new CartDto(cart))
             .ToListAsync();
 
         return list;

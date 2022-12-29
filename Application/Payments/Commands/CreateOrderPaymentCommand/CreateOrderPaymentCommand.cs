@@ -5,9 +5,9 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Sockets;
 
-namespace Application.Payments;
+namespace Application.Payments.Commands.CreateOrderPaymentCommand;
 
-public record CreateOrderPaymentCommand (int orderId, PaymentBodyDto paymentBodyDto) : IRequest<PaymentDto>;
+public record CreateOrderPaymentCommand(int orderId, PaymentBodyDto paymentBodyDto) : IRequest<PaymentDto>;
 
 
 public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPaymentCommand, PaymentDto>
@@ -32,9 +32,9 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
         {
             OrderId = request.orderId,
             Provider = request.paymentBodyDto.Provider,
-            Status= request.paymentBodyDto.Status
+            Status = request.paymentBodyDto.Status
         };
-        
+
 
         _dbContext.Payments.Add(entity);
 
@@ -47,13 +47,7 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
             throw new ForbiddenAccessException();
         }
 
-        var deliveryDto = new PaymentDto
-        {
-            Id = entity.Id,
-            OrderId = entity.OrderId,
-            Provider = request.paymentBodyDto.Provider,
-            Status = request.paymentBodyDto.Status
-        };
+        var deliveryDto = new PaymentDto(entity);
 
         return deliveryDto;
     }

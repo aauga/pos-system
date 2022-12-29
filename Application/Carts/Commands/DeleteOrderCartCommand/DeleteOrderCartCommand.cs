@@ -6,7 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Sockets;
 
-namespace Application.Carts;
+namespace Application.Carts.Commands.DeleteOrderCartCommand;
 
 public record DeleteOrderCartCommand(int orderId, int itemId) : IRequest;
 

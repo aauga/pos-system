@@ -28,15 +28,7 @@ public class GetOrderCartQueryHandler : IRequestHandler<GetOrderCartQuery, CartD
             throw new NotFoundException(nameof(Cart));
         }
 
-        var cartDto = new CartDto
-        {
-            Id = cart.Id,
-            OrderId = request.orderId,
-            ItemId = request.itemId,
-            Quantity = cart.Quantity,
-            Discount = cart.Discount,
-            Description = cart.Description
-        };
+        var cartDto = new CartDto(cart);
 
         return cartDto;
     }

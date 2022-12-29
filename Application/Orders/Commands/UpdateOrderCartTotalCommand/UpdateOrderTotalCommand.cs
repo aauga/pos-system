@@ -1,13 +1,12 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
-using Application.Orders;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Orders;
+namespace Application.Orders.Commands.UpdateOrderCartTotalCommand;
 
-public record UpdateOrderTotalCommand (int id) : IRequest;
+public record UpdateOrderTotalCommand(int id) : IRequest;
 
 public class UpdateOrderTotalCommandHandler : IRequestHandler<UpdateOrderTotalCommand>
 {
@@ -39,11 +38,11 @@ public class UpdateOrderTotalCommandHandler : IRequestHandler<UpdateOrderTotalCo
                 .Single(b => b.Id == cart.ItemId);
             if (cart.Discount == 0)
             {
-                total += item.Price * (decimal)cart.Quantity;
+                total += item.Price * cart.Quantity;
             }
             else
             {
-                total += item.Price * (decimal)cart.Quantity * (100 - cart.Discount)/100;
+                total += item.Price * cart.Quantity * (100 - cart.Discount) / 100;
             }
         }
 

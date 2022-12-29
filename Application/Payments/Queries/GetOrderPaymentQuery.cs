@@ -29,13 +29,7 @@ public class GetOrderPaymentQueryHandler : IRequestHandler<GetOrderPaymentQuery,
 
         var list = await _dbContext.Payments
             .Where(b => b.OrderId == request.orderId)
-            .Select(item => new PaymentDto
-            {
-                Id = item.Id,
-                OrderId = item.OrderId,
-                Provider = item.Provider,
-                Status = item.Status
-            })
+            .Select(payment => new PaymentDto(payment))
             .ToListAsync();
 
         return list;

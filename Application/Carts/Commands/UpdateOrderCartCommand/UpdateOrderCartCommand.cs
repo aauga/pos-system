@@ -6,7 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Sockets;
 
-namespace Application.Carts;
+namespace Application.Carts.Commands.UpdateOrderCartCommand;
 
 public record UpdateOrderCartCommand(int orderId, int itemId, CartBodyDto cartBodyDto) : IRequest<CartDto>;
 
@@ -42,16 +42,8 @@ public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartComm
         {
             throw new ForbiddenAccessException();
         }
-        
-        var cartDto = new CartDto
-        {
-            Id = entity.Id,
-            OrderId = entity.OrderId,
-            ItemId = entity.ItemId,
-            Quantity = entity.Quantity,
-            Discount = entity.Discount,
-            Description = entity.Description
-        };
+
+        var cartDto = new CartDto(entity);
 
         return cartDto;
     }

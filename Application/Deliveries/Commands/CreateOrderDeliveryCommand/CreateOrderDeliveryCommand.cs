@@ -4,7 +4,7 @@ using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Deliveries;
+namespace Application.Deliveries.Commands.CreateOrderDeliveryCommand;
 
 public record CreateOrderDeliveryCommand(int orderId, DeliveryBodyDto deliveryBodyDto) : IRequest<DeliveryDto>;
 
@@ -32,9 +32,9 @@ public class CreateOrderDeliveryCommandHandler : IRequestHandler<CreateOrderDeli
             OrderId = request.orderId,
             Address = request.deliveryBodyDto.Address,
             PostCode = request.deliveryBodyDto.PostCode,
-            Details= request.deliveryBodyDto.Details
+            Details = request.deliveryBodyDto.Details
         };
-        
+
 
         _dbContext.Deliveries.Add(entity);
 
