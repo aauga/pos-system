@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 using System.Security.Claims;
-=======
-using System.Text;
->>>>>>> main
 using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Domain.Entities;
