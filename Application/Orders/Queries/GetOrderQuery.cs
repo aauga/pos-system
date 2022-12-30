@@ -2,10 +2,20 @@
 using Application.Common.Interfaces;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Application.Orders;
 
-public record GetOrderQuery(int id) : IRequest<OrderDto>;
+public record GetOrderQuery(int id) : IAuthorizedRequest<OrderDto>
+{
+    internal Employee employee;
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.employee = employee;
+        return await userService.CanManageOrdersAsync(employee);
+    }
+}
 
 public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, OrderDto>
 {
@@ -18,9 +28,9 @@ public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, OrderDto>
 
     public async Task<OrderDto> Handle(GetOrderQuery request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.FindAsync(request.id);
+        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.id);
 
-        if (order == null)
+        if (order == default(Order))
         {
             throw new NotFoundException(nameof(Order), request.id);
         }

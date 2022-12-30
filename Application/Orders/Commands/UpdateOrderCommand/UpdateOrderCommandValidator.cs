@@ -12,8 +12,6 @@ public class UpdateOrderCartCommandValidator : AbstractValidator<UpdateOrderComm
     public UpdateOrderCartCommandValidator()
     {
         RuleFor(x => x.orderBodyDto.CustomerId).NotEmpty();
-        RuleFor(x => x.orderBodyDto.EmployeeId).NotEmpty();
-        RuleFor(x => x.orderBodyDto.TenantId).NotEmpty();
         RuleFor(x => x.orderBodyDto.Total).GreaterThanOrEqualTo(0);
         RuleFor(x => x.orderBodyDto.Tip).GreaterThanOrEqualTo(0);
         RuleFor(x => x.orderBodyDto.Delivery).Length(0, 20);

@@ -53,7 +53,7 @@ public class OrderController : ApiControllerBase
     /// <response code="400">Bad request.</response>
     /// <response code="403">Forbidden.</response>
     [HttpPost]
-    public async Task<ActionResult<OrderDto>> Create([FromBody] OrderBodyDto orderBodyDto)
+    public async Task<ActionResult<OrderDto>> Create([FromBody]OrderBodyDto orderBodyDto)
     {
         var order = await Mediator.Send(new CreateOrderCommand(orderBodyDto));
         return Created(order);
@@ -75,7 +75,7 @@ public class OrderController : ApiControllerBase
     }
 
     /// <summary>
-    /// Replace existing information about an order.
+    /// Delete information about an order.
     /// </summary>
     /// <response code="200">Information was deleted successfully.</response>
     /// <response code="403">Forbidden.</response>

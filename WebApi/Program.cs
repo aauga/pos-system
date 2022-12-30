@@ -21,7 +21,6 @@ builder.Services.AddSwaggerGen(options =>
         Title = "Team KAVA PoS API",
         Description = "An API for a Point of Sale system developed by Team KAVA for PS Software Design and Architecture course based on documentation provided by Team SusikurtiMain();",
     });
-
     // using System.Reflection;
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));

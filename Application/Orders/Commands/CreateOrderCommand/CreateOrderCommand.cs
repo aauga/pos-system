@@ -1,12 +1,21 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Domain.Entities;
+using Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders.Commands.CreateOrderCommand;
 
-public record CreateOrderCommand (OrderBodyDto orderBodyDto) : IRequest<OrderDto>;
+public record CreateOrderCommand(OrderBodyDto orderBodyDto) : IAuthorizedRequest<OrderDto>
+{
+    internal Employee employee;
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.employee = employee;
+        return await userService.CanManageOrdersAsync(employee);
+    }
+}
 
 public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, OrderDto>
 {
@@ -22,7 +31,8 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
         var entity = new Order
         {
             CustomerId = request.orderBodyDto.CustomerId,
-            EmployeeId = request.orderBodyDto.EmployeeId,
+            EmployeeId = request.employee.Id,
+            TenantId = request.employee.TenantId,
             Total = request.orderBodyDto.Total,
             Tip = request.orderBodyDto.Tip,
             Delivery = request.orderBodyDto.Delivery,

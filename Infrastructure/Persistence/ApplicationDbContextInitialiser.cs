@@ -86,7 +86,7 @@ public class ApplicationDbContextInitialiser
             Username = "admin",
             Password = "admin",
             Position = PositionType.Admin,
-            TenantId = tenantsExist ? null : 1,
+            TenantId = 1,
         };
     }
 }

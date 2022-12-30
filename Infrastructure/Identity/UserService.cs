@@ -56,4 +56,10 @@ public class UserService : IUserService
     {
         return await _dbContext.Tenants.AnyAsync(x => x.Id == tenantId);
     }
+
+    public async Task<bool> CanManageOrdersAsync(Employee employee)
+    {
+        var authorized = employee.Position >= PositionType.Cashier;
+        return await Task.FromResult(authorized);
+    }
 }

@@ -6,8 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders.Commands.UpdateOrderCommand;
 
-public record UpdateOrderCommand (int id, OrderBodyDto orderBodyDto) : IRequest<OrderDto>;
-
+public record UpdateOrderCommand (int id, OrderBodyDto orderBodyDto) : IAuthorizedRequest<OrderDto>
+{
+    internal Employee employee;
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.employee = employee;
+        return await userService.CanManageOrdersAsync(employee);
+    }
+}
 
 public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, OrderDto>
 {
@@ -20,16 +27,16 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
 
     public async Task<OrderDto> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Orders.FindAsync(request.id);
+        var entity = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.id);
 
-        if (entity == null)
+        if (entity == default(Order))
         {
             throw new NotFoundException(nameof(Order), request.id);
         }
 
         entity.CustomerId = request.orderBodyDto.CustomerId;
-        entity.EmployeeId = request.orderBodyDto.EmployeeId;
-        entity.TenantId = request.orderBodyDto.TenantId;
+        entity.TenantId = request.employee.TenantId;
+        entity.EmployeeId = request.employee.Id;
         entity.Total = request.orderBodyDto.Total;
         entity.Tip = request.orderBodyDto.Tip;
         entity.Delivery = request.orderBodyDto.Delivery;
