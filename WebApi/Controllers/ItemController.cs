@@ -30,4 +30,17 @@ public class ItemController : ApiControllerBase
     {
         return await Mediator.Send(command);
     }
+
+    /// <summary>
+    /// Replace existing information about an item.
+    /// </summary>
+    /// <response code="200">Item information was replaced and new information sent back.</response>
+    /// <response code="400">Bad request.</response>
+    /// <response code="403">Forbidden.</response>
+    /// <response code="404">Item was not found.</response>
+    [HttpPut("{id}")]
+    public async Task<ActionResult<ItemDto>> Update(int id, [FromBody] ItemBodyDto itemDto)
+    {
+        return await Mediator.Send(new UpdateItemCommand(id, itemDto));
+    }
 }
