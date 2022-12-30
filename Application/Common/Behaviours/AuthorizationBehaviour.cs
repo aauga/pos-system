@@ -1,4 +1,4 @@
-using System.Text;
+using System.Security.Claims;
 using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Domain.Entities;
@@ -31,9 +31,17 @@ public class AuthorizationBehaviour<TRequest, TResponse> :
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        var credentials = GetUserCredentials();
-        var employee = await GetEmployeeAsync(credentials);
-        var userAuthorized = await UserAuthorized(employee, request);
+        var user = _httpContextAccessor.HttpContext.User;
+
+        if (user is null)
+        {
+            throw new UnauthorizedAccessException();
+        }
+        
+        // From here, user is authenticated with the correct username and password
+        var username = GetUsername(user);
+        var employee = await GetEmployeeAsync(username);
+        var userAuthorized = await CheckIfUserAuthorized(employee, request);
 
         if (!userAuthorized)
         {
@@ -43,33 +51,31 @@ public class AuthorizationBehaviour<TRequest, TResponse> :
         return await next();
     }
 
-    private string[] GetUserCredentials()
+    private string GetUsername(ClaimsPrincipal user)
     {
-        var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"][0];
+        var username = user.Claims.FirstOrDefault(x => x.Type == "Username").Value;
 
-        try
+        if (string.IsNullOrEmpty(username))
         {
-            var base64 = token.Replace("Basic ", "");
-            var bytes = Convert.FromBase64String(base64);
-            var decodedValue = Encoding.UTF8.GetString(bytes);
-
-            return decodedValue.Split(":");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occured while authorizing user");
             throw new ForbiddenAccessException();
         }
+
+        return username;
     }
 
-    private async Task<Employee> GetEmployeeAsync(string[] credentials)
+    private async Task<Employee> GetEmployeeAsync(string username)
     {
-        return await _dbContext.Employees.FirstOrDefaultAsync(x =>
-            x.Username == credentials[0] &&
-            x.Password == credentials[1]);
+        var employee = await _dbContext.Employees.FirstOrDefaultAsync(x => x.Username == username);
+
+        if (employee is null)
+        {
+            throw new ForbiddenAccessException();
+        }
+
+        return employee;
     }
 
-    private async Task<bool> UserAuthorized(Employee employee, TRequest request)
+    private async Task<bool> CheckIfUserAuthorized(Employee employee, TRequest request)
     {
         if (request is IAuthorizedRequest<TResponse>)
         {
@@ -79,10 +85,10 @@ public class AuthorizationBehaviour<TRequest, TResponse> :
 
         if (request is IAuthorizedRequest)
         {
-            var authorizedRequest = request as IAuthorizedRequest<TResponse>;
+            var authorizedRequest = request as IAuthorizedRequest;
             return await authorizedRequest.Authorize(employee, _userService, _dbContext);
         }
 
-        return false;
+        return true;
     }
 }
