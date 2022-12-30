@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Items;
 
-public record UpdateItemCommand (int id, ItemBodyDto item) : IRequest<ItemDto>;
+public record UpdateItemCommand (int Id, ItemBodyDto item) : IRequest<ItemDto>;
 
 public class UpdateItemCommandHandler : IRequestHandler<UpdateItemCommand, ItemDto>
 {
@@ -20,11 +20,11 @@ public class UpdateItemCommandHandler : IRequestHandler<UpdateItemCommand, ItemD
 
     public async Task<ItemDto> Handle(UpdateItemCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Items.FindAsync(request.id);
+        var entity = await _dbContext.Items.FindAsync(request.Id);
 
         if (entity == null)
         {
-            throw new NotFoundException(nameof(Order), request.id);
+            throw new NotFoundException(nameof(Order), request.Id);
         }
 
         entity.Title = request.item.Title;

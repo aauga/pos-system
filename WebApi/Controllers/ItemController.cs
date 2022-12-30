@@ -53,4 +53,17 @@ public class ItemController : ApiControllerBase
     {
         return await Mediator.Send(new UpdateItemCommand(id, itemDto));
     }
+
+    /// <summary>
+    /// Delete item.
+    /// </summary>
+    /// <response code="200">Information was deleted successfully.</response>
+    /// <response code="403">Forbidden.</response>
+    /// <response code="404">Item was not found.</response>
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        await Mediator.Send(new DeleteItemCommand(id));
+        return Ok();
+    }
 }
