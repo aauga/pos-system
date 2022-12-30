@@ -34,6 +34,13 @@ builder.Services.AddControllers(options => {
 builder.Services.AddFluentValidationAutoValidation()
     .AddFluentValidationClientsideAdapters();
 
+builder.Services.AddControllers(options => {
+    options.Filters.Add<ApiExceptionFilterAttribute>();
+});
+
+builder.Services.AddFluentValidationAutoValidation()
+    .AddFluentValidationClientsideAdapters();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
