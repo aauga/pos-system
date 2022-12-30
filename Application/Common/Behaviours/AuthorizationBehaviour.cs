@@ -53,14 +53,10 @@ public class AuthorizationBehaviour<TRequest, TResponse> :
 
     private string GetUsername(ClaimsPrincipal user)
     {
-        var username = user.Claims.FirstOrDefault(x => x.Type == "Username").Value;
+        var username = user.Claims.FirstOrDefault(x => x.Type == "Username")
+            ?? throw new UnauthorizedAccessException();
 
-        if (string.IsNullOrEmpty(username))
-        {
-            throw new ForbiddenAccessException();
-        }
-
-        return username;
+        return username.Value;
     }
 
     private async Task<Employee> GetEmployeeAsync(string username)
