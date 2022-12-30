@@ -7,11 +7,11 @@ namespace Application.Items;
 
 public record GetItemQuery(int id) : IRequest<ItemDto>;
 
-public class GetOrderQueryHandler : IRequestHandler<GetItemQuery, ItemDto>
+public class GetItemQueryHandler : IRequestHandler<GetItemQuery, ItemDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
-    public GetOrderQueryHandler(IApplicationDbContext dbContext)
+    public GetItemQueryHandler(IApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }

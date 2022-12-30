@@ -9,6 +9,16 @@ namespace WebApi.Controllers;
 public class ItemController : ApiControllerBase
 {
     /// <summary>
+    /// Get all items.
+    /// </summary>
+    /// <response code="200">List of items identifiers was returned.</response>
+    [HttpGet]
+    public async Task<IEnumerable<ItemDto>> GetItems([FromQuery] GetItemsQuery query)
+    {
+        return await Mediator.Send(query);
+    }
+
+    /// <summary>
     /// Get item by ID.
     /// </summary>
     /// <response code="200">Information about item was returned.</response>
