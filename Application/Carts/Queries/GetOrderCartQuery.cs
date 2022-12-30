@@ -6,8 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Carts;
 
-public record GetOrderCartQuery (int orderId, int itemId) : IRequest<CartDto>;
-
+public record GetOrderCartQuery (int orderId, int itemId) : IAuthorizedRequest<CartDto>
+{
+    internal Employee employee;
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.employee = employee;
+        return await userService.CanManageOrdersAsync(employee);
+    }
+}
 
 public class GetOrderCartQueryHandler : IRequestHandler<GetOrderCartQuery, CartDto>
 {

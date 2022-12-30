@@ -8,7 +8,15 @@ using System.Net.Sockets;
 
 namespace Application.Carts.Commands.DeleteOrderCartCommand;
 
-public record DeleteOrderCartCommand(int orderId, int itemId) : IRequest;
+public record DeleteOrderCartCommand(int orderId, int itemId) : IAuthorizedRequest
+{
+    internal Employee employee;
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.employee = employee;
+        return await userService.CanManageOrdersAsync(employee);
+    }
+}
 
 
 public class DeleteOrderCartCommandHandler : IRequestHandler<DeleteOrderCartCommand>

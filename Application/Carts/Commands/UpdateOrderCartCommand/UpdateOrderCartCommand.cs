@@ -8,8 +8,15 @@ using System.Net.Sockets;
 
 namespace Application.Carts.Commands.UpdateOrderCartCommand;
 
-public record UpdateOrderCartCommand(int orderId, int itemId, CartBodyDto cartBodyDto) : IRequest<CartDto>;
-
+public record UpdateOrderCartCommand(int orderId, int itemId, CartBodyDto cartBodyDto) : IAuthorizedRequest<CartDto>
+{
+    internal Employee employee;
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.employee = employee;
+        return await userService.CanManageOrdersAsync(employee);
+    }
+}
 
 public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartCommand, CartDto>
 {
