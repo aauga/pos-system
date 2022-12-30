@@ -14,6 +14,7 @@ public class CreateItemCommand : IRequest<ItemDto>
     public string? Description { get; init; }
     public string? Brand { get; init; }
     public string? Photo { get; init; }
+    public int TenantId { get; init; }
 }
 
 public class CreateItemCommandHandler: IRequestHandler<CreateItemCommand, ItemDto>
@@ -34,7 +35,8 @@ public class CreateItemCommandHandler: IRequestHandler<CreateItemCommand, ItemDt
             Price = request.Price,
             Description = request.Description,
             Brand = request.Brand,
-            Photo = request.Photo
+            Photo = request.Photo,
+            TenantId = request.TenantId,
         };
 
         _dbContext.Items.Add(entity);
@@ -56,7 +58,8 @@ public class CreateItemCommandHandler: IRequestHandler<CreateItemCommand, ItemDt
             Price = entity.Price,
             Description = entity.Description,
             Brand = entity.Brand,
-            Photo = entity.Photo
+            Photo = entity.Photo,
+            TenantId = entity.TenantId
         };
 
         return itemDto;

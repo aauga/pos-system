@@ -33,7 +33,8 @@ public class GetOrderQueryHandler : IRequestHandler<GetItemQuery, ItemDto>
             Price = item.Price,
             Description = item.Description,
             Brand = item.Brand,
-            Photo = item.Photo
+            Photo = item.Photo,
+            TenantId = item.TenantId
         };
 
         return itemDto;

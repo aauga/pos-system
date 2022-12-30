@@ -1,4 +1,6 @@
-﻿namespace Application.Items;
+﻿using Domain.Entities;
+
+namespace Application.Items;
 
 public class ItemDto
 {
@@ -9,5 +11,6 @@ public class ItemDto
     public string? Description { get; set; }
     public string? Brand { get; set; }
     public string? Photo { get; set; }
+    public int TenantId { get; set; }
 }
 
