@@ -8,7 +8,15 @@ using System.Net.Sockets;
 
 namespace Application.Carts.Commands.CreateOrderCartCommand;
 
-public record CreateOrderCartCommand(int orderId, CartItemIdDto cartItemIdDto) : IRequest<CartDto>;
+public record CreateOrderCartCommand(int orderId, CartItemIdDto cartItemIdDto) : IAuthorizedRequest<CartDto>
+{
+    internal Employee employee;
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.employee = employee;
+        return await userService.CanManageOrdersAsync(employee);
+    }
+}
 
 
 public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartCommand, CartDto>
@@ -22,9 +30,9 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
 
     public async Task<CartDto> Handle(CreateOrderCartCommand request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.FindAsync(request.orderId);
+        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.orderId);
 
-        if (order == null)
+        if (order == default(Order))
         {
             throw new NotFoundException(nameof(Order), request.orderId);
         }
