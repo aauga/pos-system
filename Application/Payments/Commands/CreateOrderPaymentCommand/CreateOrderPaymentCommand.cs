@@ -7,7 +7,15 @@ using System.Net.Sockets;
 
 namespace Application.Payments.Commands.CreateOrderPaymentCommand;
 
-public record CreateOrderPaymentCommand(int orderId, PaymentBodyDto paymentBodyDto) : IRequest<PaymentDto>;
+public record CreateOrderPaymentCommand(int orderId, PaymentBodyDto paymentBodyDto) : IAuthorizedRequest<PaymentDto>
+{
+    internal Employee employee;
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.employee = employee;
+        return await userService.CanManageOrdersAsync(employee);
+    }
+}
 
 
 public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPaymentCommand, PaymentDto>
@@ -21,9 +29,9 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
 
     public async Task<PaymentDto> Handle(CreateOrderPaymentCommand request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.FindAsync(request.orderId);
+        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.orderId);
 
-        if (order == null)
+        if (order == default(Order))
         {
             throw new NotFoundException(nameof(Order), request.orderId);
         }
@@ -34,7 +42,6 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
             Provider = request.paymentBodyDto.Provider,
             Status = request.paymentBodyDto.Status
         };
-
 
         _dbContext.Payments.Add(entity);
 

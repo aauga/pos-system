@@ -19,6 +19,7 @@ using Application.Orders.Commands.DeleteOrderCommand;
 using Application.Orders.Commands.UpdateOrderCartTotalCommand;
 using Application.Deliveries.Commands.CreateOrderDeliveryCommand;
 using Application.Payments.Commands.CreateOrderPaymentCommand;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers;
 
@@ -29,7 +30,7 @@ public class OrderController : ApiControllerBase
     /// Get orders.
     /// </summary>
     /// <response code="200">List of order identifiers was returned.</response>
-    [HttpGet]
+    [HttpGet, Authorize]
     public async Task<IEnumerable<OrderDto>> GetOrders([FromQuery] GetOrdersQuery query)
     {
         return await Mediator.Send(query);
@@ -40,7 +41,7 @@ public class OrderController : ApiControllerBase
     /// </summary>
     /// <response code="200">Order was found and returned.</response>
     /// <response code="404">Order was not found</response>
-    [HttpGet("{id}")]
+    [HttpGet("{id}"), Authorize]
     public async Task<ActionResult<OrderDto>> GetOrder(int id)
     {
         return await Mediator.Send(new GetOrderQuery(id));
@@ -52,7 +53,7 @@ public class OrderController : ApiControllerBase
     /// <response code="201">Order was created and returned.</response>
     /// <response code="400">Bad request.</response>
     /// <response code="403">Forbidden.</response>
-    [HttpPost]
+    [HttpPost, Authorize]
     public async Task<ActionResult<OrderDto>> Create([FromBody]OrderBodyDto orderBodyDto)
     {
         var order = await Mediator.Send(new CreateOrderCommand(orderBodyDto));
@@ -66,7 +67,7 @@ public class OrderController : ApiControllerBase
     /// <response code="400">Bad request.</response>
     /// <response code="403">Forbidden.</response>
     /// <response code="404">Order was not found.</response>
-    [HttpPut("{id}")]
+    [HttpPut("{id}"), Authorize]
     public async Task<ActionResult<OrderDto>> Update(int id, [FromBody] OrderBodyDto orderBodyDto)
     {
         return await Mediator.Send(new UpdateOrderCommand(id, orderBodyDto));
@@ -80,7 +81,7 @@ public class OrderController : ApiControllerBase
     /// <response code="200">Information was deleted successfully.</response>
     /// <response code="403">Forbidden.</response>
     /// <response code="404">Order was not found.</response>
-    [HttpDelete("{id}")]
+    [HttpDelete("{id}"), Authorize]
     public async Task<ActionResult<Order>> Delete(int id)
     {
         await Mediator.Send(new DeleteOrderCommand(id));
@@ -93,7 +94,7 @@ public class OrderController : ApiControllerBase
     /// </summary>
     /// <response code="200">List of identifiers was returned.</response>
     /// <response code="404">Order was not found.</response>
-    [HttpGet("{id}/Cart")]
+    [HttpGet("{id}/Cart"), Authorize]
     public async Task<IEnumerable<CartDto>> GetOrderCarts(int id)
     {
         return await Mediator.Send(new GetOrderCartsQuery(id));
@@ -105,7 +106,7 @@ public class OrderController : ApiControllerBase
     /// <response code="201">Order payment was created and returned.</response>
     /// <response code="403">Order cart for specified item already exists.</response>
     /// <response code="404">Order was not found.</response>
-    [HttpPost("{id}/Cart")]
+    [HttpPost("{id}/Cart"), Authorize]
     public async Task<ActionResult<CartDto>> AddOrderCart(int id, [FromBody] CartItemIdDto cartItemIdDto)
     {
         var cart = await Mediator.Send(new CreateOrderCartCommand(id, cartItemIdDto));
@@ -118,7 +119,7 @@ public class OrderController : ApiControllerBase
     /// </summary>
     /// <response code="200">Cart information was found and returned.</response>
     /// <response code="404">Cart with order and item identifier combination was not found.</response>
-    [HttpGet("{orderId}/Cart/{itemId}")]
+    [HttpGet("{orderId}/Cart/{itemId}"), Authorize]
     public async Task<ActionResult<CartDto>> GetOrderCart(int orderId, int itemId)
     {
         return await Mediator.Send(new GetOrderCartQuery(orderId, itemId));
@@ -129,7 +130,7 @@ public class OrderController : ApiControllerBase
     /// </summary>
     /// <response code="200">Cart information was replaced and returned.</response>
     /// <response code="404">Cart with order and item identifier combination was not found.</response>
-    [HttpPut("{orderId}/Cart/{itemId}")]
+    [HttpPut("{orderId}/Cart/{itemId}"), Authorize]
     public async Task<ActionResult<CartDto>> UpdateOrderCart(int orderId, int itemId, [FromBody] CartBodyDto cartBodyDto)
     {
         var cart = await Mediator.Send(new UpdateOrderCartCommand(orderId, itemId, cartBodyDto));
@@ -142,7 +143,7 @@ public class OrderController : ApiControllerBase
     /// </summary>
     /// <response code="200">Cart information was deleted.</response>
     /// <response code="404">Cart with order and item identifier combination was not found.</response>
-    [HttpDelete("{orderId}/Cart/{itemId}")]
+    [HttpDelete("{orderId}/Cart/{itemId}"), Authorize]
     public async Task<ActionResult<CartDto>> DeleteOrderCart(int orderId, int itemId)
     {
         var cart = await Mediator.Send(new DeleteOrderCartCommand(orderId, itemId));
@@ -155,7 +156,7 @@ public class OrderController : ApiControllerBase
     /// </summary>
     /// <response code="200">List of identifiers was returned.</response>
     /// <response code="404">Order was not found</response>
-    [HttpGet("{id}/Delivery")]
+    [HttpGet("{id}/Delivery"), Authorize]
     public async Task<IEnumerable<DeliveryDto>> GetOrderDeliveries(int id)
     {
         return await Mediator.Send(new GetOrderDeliveryQuery(id));
@@ -166,7 +167,7 @@ public class OrderController : ApiControllerBase
     /// </summary>
     /// <response code="201">Order delivery was created and returned.</response>
     /// <response code="404">Order was not found</response>
-    [HttpPost("{id}/Delivery")]
+    [HttpPost("{id}/Delivery"), Authorize]
     public async Task<ActionResult<DeliveryDto>> AddOrderDelivery(int id, [FromBody] DeliveryBodyDto deliveryBodyDto)
     {
         var delivery = await Mediator.Send(new CreateOrderDeliveryCommand(id, deliveryBodyDto));
@@ -178,7 +179,7 @@ public class OrderController : ApiControllerBase
     /// </summary>
     /// <response code="200">List of identifiers was returned.</response>
     /// <response code="404">Order was not found</response>
-    [HttpGet("{id}/Payment")]
+    [HttpGet("{id}/Payment"), Authorize]
     public async Task<IEnumerable<PaymentDto>> GetOrderPayments(int id)
     {
         return await Mediator.Send(new GetOrderPaymentQuery(id));
@@ -189,7 +190,7 @@ public class OrderController : ApiControllerBase
     /// </summary>
     /// <response code="201">Order payment was created and returned.</response>
     /// <response code="404">Order was not found</response>
-    [HttpPost("{id}/Payment")]
+    [HttpPost("{id}/Payment"), Authorize]
     public async Task<ActionResult<PaymentDto>> AddOrderPayment(int id, [FromBody] PaymentBodyDto deliveryBodyDto)
     {
         var payment = await Mediator.Send(new CreateOrderPaymentCommand(id, deliveryBodyDto));

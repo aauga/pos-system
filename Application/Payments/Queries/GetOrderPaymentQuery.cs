@@ -6,8 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Payments;
 
-public record GetOrderPaymentQuery (int orderId) : IRequest<IEnumerable<PaymentDto>>;
-
+public record GetOrderPaymentQuery(int orderId) : IAuthorizedRequest<IEnumerable<PaymentDto>>
+{
+    internal Employee employee;
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.employee = employee;
+        return await userService.CanManageOrdersAsync(employee);
+    }
+}
 
 public class GetOrderPaymentQueryHandler : IRequestHandler<GetOrderPaymentQuery, IEnumerable<PaymentDto>>
 {
@@ -20,9 +27,11 @@ public class GetOrderPaymentQueryHandler : IRequestHandler<GetOrderPaymentQuery,
 
     public async Task<IEnumerable<PaymentDto>> Handle(GetOrderPaymentQuery request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.FindAsync(request.orderId);
+        var ten = request.employee.TenantId;
+        var ord = request.orderId;
+        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.orderId);
 
-        if (order == null)
+        if (order == default(Order))
         {
             throw new NotFoundException(nameof(Order), request.orderId);
         }
