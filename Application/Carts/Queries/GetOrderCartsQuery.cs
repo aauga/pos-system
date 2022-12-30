@@ -27,9 +27,9 @@ public class GetOrderCartsQueryHandler : IRequestHandler<GetOrderCartsQuery, IEn
 
     public async Task<IEnumerable<CartDto>> Handle(GetOrderCartsQuery request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.FindAsync(request.orderId);
+        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.orderId);
 
-        if (order == null)
+        if (order == default(Order))
         {
             throw new NotFoundException(nameof(Order), request.orderId);
         }
