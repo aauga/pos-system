@@ -61,7 +61,7 @@ public class ApplicationDbContextInitialiser
 
         if (!employeesExist)
         {
-            var employee = SeedEmployee(tenantsExist);
+            var employee = SeedEmployee();
             _dbContext.Employees.Add(employee);
         }
 
@@ -79,14 +79,14 @@ public class ApplicationDbContextInitialiser
         };
     }
 
-    private Employee SeedEmployee(bool tenantsExist)
+    private Employee SeedEmployee()
     {
         return new Employee
         {
             Username = "admin",
             Password = "admin",
             Position = PositionType.Admin,
-            TenantId = tenantsExist ? null : 1,
+            TenantId = 1,
         };
     }
 }

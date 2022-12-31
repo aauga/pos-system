@@ -14,7 +14,7 @@ public class UpdateOrderCommand : IRequest<OrderDto>
     public int EmployeeId { get; init; }
     public decimal Total { get; init; }
     public int Tip { get; init; }
-    public string? Delivery { get; init; }
+    public string Delivery { get; init; }
     public DateTime Date { get; init; }
 }
 
