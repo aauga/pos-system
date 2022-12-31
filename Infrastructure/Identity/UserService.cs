@@ -56,4 +56,19 @@ public class UserService : IUserService
     {
         return await _dbContext.Tenants.AnyAsync(x => x.Id == tenantId);
     }
+
+    public async Task<bool> CanViewItemsAsync(Employee employee, int itemId)
+    {
+        var item = await _dbContext.Items.FindAsync(itemId);
+        var authorized = item.TenantId == employee.TenantId && employee.Position >= PositionType.Cashier;
+
+        return await Task.FromResult(authorized);
+    }
+
+    public async Task<bool> CanViewItemsAsync(Employee employee)
+    {
+        var authorized = employee.Position >= PositionType.Cashier;
+
+        return await Task.FromResult(authorized);
+    }
 }

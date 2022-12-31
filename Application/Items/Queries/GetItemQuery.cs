@@ -2,10 +2,20 @@
 using Application.Common.Interfaces;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Items;
 
-public record GetItemQuery(int id) : IRequest<ItemDto>;
+public record GetItemQuery(int Id) : IAuthorizedRequest<ItemDto>
+{
+    public Employee Employee;
+
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.Employee = employee;
+        return await userService.CanViewItemsAsync(employee, Id);
+    }
+}
 
 public class GetItemQueryHandler : IRequestHandler<GetItemQuery, ItemDto>
 {
@@ -18,11 +28,11 @@ public class GetItemQueryHandler : IRequestHandler<GetItemQuery, ItemDto>
 
     public async Task<ItemDto> Handle(GetItemQuery request, CancellationToken cancellationToken)
     {
-        var item = await _dbContext.Items.FindAsync(request.id);
+        var item = await _dbContext.Items.FindAsync(request.Id);
 
         if (item == null)
         {
-            throw new NotFoundException(nameof(Item), request.id);
+            throw new NotFoundException(nameof(Item), request.Id);
         }
 
         var itemDto = new ItemDto

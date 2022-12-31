@@ -1,17 +1,18 @@
 ﻿using Application.Items;
 using Application.Orders;
 using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebUI.Controllers;
 
 namespace WebApi.Controllers;
 
+[Authorize]
 public class ItemController : ApiControllerBase
 {
     /// <summary>
     /// Get all items.
     /// </summary>
-    /// <response code="200">List of items identifiers was returned.</response>
     [HttpGet]
     public async Task<IEnumerable<ItemDto>> GetItems([FromQuery] GetItemsQuery query)
     {
@@ -21,9 +22,6 @@ public class ItemController : ApiControllerBase
     /// <summary>
     /// Get item by ID.
     /// </summary>
-    /// <response code="200">Information about item was returned.</response>
-    /// <response code="403">Forbidden.</response>
-    /// <response code="404">Item with specified identifier was not found.</response>
     [HttpGet("{id}")]
     public async Task<ActionResult<ItemDto>> GetItem(int id)
     {
@@ -33,8 +31,6 @@ public class ItemController : ApiControllerBase
     /// <summary>
     /// Create a new item.
     /// </summary>
-    /// <response code="200">Item was created and returned.</response>
-    /// <response code="403">Forbidden.</response>
     [HttpPost]
     public async Task<ActionResult<ItemDto>> Create(CreateItemCommand command)
     {
@@ -44,10 +40,6 @@ public class ItemController : ApiControllerBase
     /// <summary>
     /// Replace existing information about an item.
     /// </summary>
-    /// <response code="200">Item information was replaced and new information sent back.</response>
-    /// <response code="400">Bad request.</response>
-    /// <response code="403">Forbidden.</response>
-    /// <response code="404">Item was not found.</response>
     [HttpPut("{id}")]
     public async Task<ActionResult<ItemDto>> Update(int id, [FromBody] ItemBodyDto itemDto)
     {
@@ -57,9 +49,6 @@ public class ItemController : ApiControllerBase
     /// <summary>
     /// Delete item.
     /// </summary>
-    /// <response code="200">Information was deleted successfully.</response>
-    /// <response code="403">Forbidden.</response>
-    /// <response code="404">Item was not found.</response>
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {

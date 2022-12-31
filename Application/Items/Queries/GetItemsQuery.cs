@@ -7,10 +7,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Items;
 
-public record GetItemsQuery : IRequest<IEnumerable<ItemDto>>
+public record GetItemsQuery : IAuthorizedRequest<IEnumerable<ItemDto>>
 {
-    public int offset { get; init; } = 0;
-    public int limit { get; init; } = 20;
+    public Employee employee;
+    public int Offset { get; init; } = 0;
+    public int Limit { get; init; } = 20;
+
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.employee = employee;
+        return await userService.CanViewItemsAsync(employee);
+    }
 }
 
 public class GetItemsQueryHandler : IRequestHandler<GetItemsQuery, IEnumerable<ItemDto>>
@@ -27,8 +34,9 @@ public class GetItemsQueryHandler : IRequestHandler<GetItemsQuery, IEnumerable<I
     {
         var list = await _dbContext.Items
             .OrderBy(b => b.Id)
-            .Skip(request.offset)
-            .Take(request.limit)
+            .Where(b => b.TenantId == request.employee.TenantId)
+            .Skip(request.Offset)
+            .Take(request.Limit)
             .Select(item => new ItemDto
             {
                 Id = item.Id,
