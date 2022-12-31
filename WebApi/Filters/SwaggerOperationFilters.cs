@@ -1,3 +1,4 @@
+using Application.Common.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -8,6 +9,7 @@ public class SwaggerOperationFilters : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
+        AddSummaries(ref operation, context);
         Created_PostRequests(ref operation, context);
         BadRequestException_PostAndPutRequests(ref operation, context);
         UnauthorizedAndForbidden_AuthorizedRequests(ref operation, context);
@@ -60,6 +62,19 @@ public class SwaggerOperationFilters : IOperationFilter
         if (hasPathParameters)
         {
             operation.Responses.Add("404", new OpenApiResponse { Description = "Resource Not Found" });
+        }
+    }
+
+    public void AddSummaries(ref OpenApiOperation operation, OperationFilterContext context)
+    {
+        var summaryAttribute = context.MethodInfo
+            .GetCustomAttributes(true)
+            .OfType<SummaryAttribute>()
+            .FirstOrDefault();
+
+        if (summaryAttribute is not null)
+        {
+            operation.Summary = summaryAttribute.Summary;
         }
     }
 }

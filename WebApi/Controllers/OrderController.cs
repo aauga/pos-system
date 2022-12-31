@@ -10,43 +10,37 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using WebAPI.Filters;
+using Swashbuckle.AspNetCore.Annotations;
+using Application.Common.Attributes;
 
 namespace WebApi.Controllers;
 
 
 public class OrderController : ApiControllerBase
 {
-    /// <summary>
-    /// Get orders.
-    /// </summary>
     [HttpGet]
+    [Summary("Get orders.")]
     public async Task<IEnumerable<OrderDto>> GetOrders([FromQuery] GetOrdersQuery query)
     {
         return await Mediator.Send(query);
     }
 
-    /// <summary>
-    /// Get order by ID.
-    /// </summary>
     [HttpGet("{id}")]
+    [Summary("Get order by ID.")]
     public async Task<ActionResult<OrderDto>> GetOrder(int id)
     {
         return await Mediator.Send(new GetOrderQuery(id));
     }
 
-    /// <summary>
-    /// Create a new order.
-    /// </summary>
     [HttpPost]
+    [Summary("Create a new order.")]
     public async Task<ActionResult<OrderDto>> Create(CreateOrderCommand command)
     {
         return await Mediator.Send(command);
     }
 
-    /// <summary>
-    /// Replace existing information about an order.
-    /// </summary>
     [HttpPut("{id}")]
+    [Summary("Replace existing information about an order.")]
     public async Task<ActionResult<OrderDto>> Update(int id, UpdateOrderCommand command)
     {
         if (id != command.Id)
@@ -55,14 +49,10 @@ public class OrderController : ApiControllerBase
         }
 
         return await Mediator.Send(command);
-
-        //return NoContent();
     }
 
-    /// <summary>
-    /// Replace existing information about an order.
-    /// </summary>
     [HttpDelete("{id}")]
+    [Summary("Replace existing information about an order.")]
     public async Task<ActionResult<Order>> Delete(int id)
     {
         await Mediator.Send(new DeleteOrderCommand(id));
@@ -70,19 +60,15 @@ public class OrderController : ApiControllerBase
         
     }
 
-    /// <summary>
-    /// Get list of item identifiers in the order cart.
-    /// </summary>
     [HttpGet("{id}/Cart")]
+    [Summary("Get list of item identifiers in the order cart.")]
     public async Task<IEnumerable<CartDto>> GetOrderCarts(int id)
     {
         return await Mediator.Send(new GetOrderCartsQuery(id));
     }
 
-    /// <summary>
-    /// Create a new item cart for the order.
-    /// </summary>
     [HttpPost("{id}/Cart")]
+    [Summary("Create a new item cart for the order.")]
     public async Task<ActionResult<CartDto>> AddOrderCart(int id, [FromBody] CartItemIdDto cartItemIdDto)
     {
         var cart = await Mediator.Send(new CreateOrderCartCommand(id, cartItemIdDto));
@@ -90,19 +76,15 @@ public class OrderController : ApiControllerBase
         return cart;
     }
 
-    /// <summary>
-    /// Get information about an item in the order cart.
-    /// </summary>
     [HttpGet("{orderId}/Cart/{itemId}")]
+    [Summary("Get information about an item in the order cart.")]
     public async Task<ActionResult<CartDto>> GetOrderCart(int orderId, int itemId)
     {
         return await Mediator.Send(new GetOrderCartQuery(orderId, itemId));
     }
 
-    /// <summary>
-    /// Replace existing cart information.
-    /// </summary>
     [HttpPut("{orderId}/Cart/{itemId}")]
+    [Summary("Replace existing cart information.")]
     public async Task<ActionResult<CartDto>> UpdateOrderCart(int orderId, int itemId, [FromBody] CartBodyDto cartBodyDto)
     {
         var cart = await Mediator.Send(new UpdateOrderCartCommand(orderId, itemId, cartBodyDto));
@@ -110,10 +92,8 @@ public class OrderController : ApiControllerBase
         return cart;
     }
 
-    /// <summary>
-    /// Delete existing cart information.
-    /// </summary>
     [HttpDelete("{orderId}/Cart/{itemId}")]
+    [Summary("Delete existing cart information.")]
     public async Task<ActionResult<CartDto>> DeleteOrderCart(int orderId, int itemId)
     {
         var cart = await Mediator.Send(new DeleteOrderCartCommand(orderId, itemId));
@@ -121,37 +101,29 @@ public class OrderController : ApiControllerBase
         return Ok();
     }
 
-    /// <summary>
-    /// Get all delivery identifiers for the specified order.
-    /// </summary>
     [HttpGet("{id}/Delivery")]
+    [Summary("Get all delivery identifiers for the specified order.")]
     public async Task<IEnumerable<DeliveryDto>> GetOrderDeliveries(int id)
     {
         return await Mediator.Send(new GetOrderDeliveryQuery(id));
     }
 
-    /// <summary>
-    /// Create a new delivery of the order.
-    /// </summary>
     [HttpPost("{id}/Delivery")]
+    [Summary("Create a new delivery of the order.")]
     public async Task<ActionResult<DeliveryDto>> AddOrderDelivery(int id, [FromBody] DeliveryBodyDto deliveryBodyDto)
     {
         return await Mediator.Send(new CreateOrderDeliveryCommand(id, deliveryBodyDto));
     }
 
-    /// <summary>
-    /// Get all payment identifiers for the specified order.
-    /// </summary>
     [HttpGet("{id}/Payment")]
+    [Summary("Get all payment identifiers for the specified order.")]
     public async Task<IEnumerable<PaymentDto>> GetOrderPayments(int id)
     {
         return await Mediator.Send(new GetOrderPaymentQuery(id));
     }
 
-    /// <summary>
-    /// Create a new payment of the order.
-    /// </summary>
     [HttpPost("{id}/Payment")]
+    [Summary("Create a new payment of the order")]
     public async Task<ActionResult<PaymentDto>> AddOrderPayment(int id, [FromBody] PaymentBodyDto deliveryBodyDto)
     {
         return await Mediator.Send(new CreateOrderPaymentCommand(id, deliveryBodyDto));
