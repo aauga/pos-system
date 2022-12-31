@@ -1,5 +1,7 @@
 ﻿using Application.Common.Interfaces;
+using Infrastructure.Identity;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +18,14 @@ public static class DependencyInjection
         {
             options.UseSqlite(configuration.GetConnectionString("Default"));
         });
+
+        services
+            .AddAuthentication("BasicAuthentication")
+            .AddScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
         
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<ApplicationDbContextInitialiser>();
+        services.AddTransient<IUserService, UserService>();
 
         return services;
     }

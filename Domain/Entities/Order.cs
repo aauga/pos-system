@@ -10,9 +10,11 @@ public class Order : BaseEntity
     public int EmployeeId { get; set; }
     public decimal Total { get; set; }
     public decimal Tip { get; set; }
-    public string? Delivery { get; set; }
     public DateTime Date { get; set; }
     public IEnumerable<Cart> Carts { get; set; }
     public IEnumerable<Payment> Payments { get; set; }
     public IEnumerable<Delivery> Deliveries { get; set; }
+
+    #nullable enable
+    public string? Delivery { get; set; }
 }

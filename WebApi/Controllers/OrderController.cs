@@ -2,7 +2,7 @@ using Application.Orders;
 using Application.Deliveries;
 using Application.Payments;
 using Application.Carts;
-using CleanArchitecture.WebUI.Controllers;
+using WebUI.Controllers;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;

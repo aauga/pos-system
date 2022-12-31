@@ -25,7 +25,6 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Tenant> Tenants => Set<Tenant>();
-    public DbSet<User> Users => Set<User>();
     public DbSet<Review> Reviews => Set<Review>();
     
     protected override void OnModelCreating(ModelBuilder builder)
