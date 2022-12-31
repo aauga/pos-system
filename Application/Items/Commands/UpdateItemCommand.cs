@@ -53,7 +53,6 @@ public class UpdateItemCommandHandler : IRequestHandler<UpdateItemCommand, ItemD
             Description = entity.Description,
             Brand = entity.Brand,
             Photo = entity.Photo,
-            TenantId = entity.TenantId
         };
 
         return itemDto;

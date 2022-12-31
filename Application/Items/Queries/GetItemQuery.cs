@@ -44,7 +44,6 @@ public class GetItemQueryHandler : IRequestHandler<GetItemQuery, ItemDto>
             Description = item.Description,
             Brand = item.Brand,
             Photo = item.Photo,
-            TenantId = item.TenantId
         };
 
         return itemDto;

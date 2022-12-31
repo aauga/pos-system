@@ -29,7 +29,6 @@ public class GetItemsQueryHandler : IRequestHandler<GetItemsQuery, IEnumerable<I
         _dbContext = dbContext;
     }
 
-    // TODO: add filtering by tenantId after merging auth
     public async Task<IEnumerable<ItemDto>> Handle(GetItemsQuery request, CancellationToken cancellationToken)
     {
         var list = await _dbContext.Items
@@ -46,7 +45,6 @@ public class GetItemsQueryHandler : IRequestHandler<GetItemsQuery, IEnumerable<I
                 Description = item.Description,
                 Brand = item.Brand,
                 Photo = item.Photo,
-                TenantId = item.TenantId
             })
             .ToListAsync();
 

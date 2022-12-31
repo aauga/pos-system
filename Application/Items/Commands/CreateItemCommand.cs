@@ -6,15 +6,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Items;
 
-public class CreateItemCommand : IRequest<ItemDto>
+public record CreateItemCommand : IAuthorizedRequest<ItemDto>
 {
+    public Employee Employee;
     public string? Title { get; init; }
     public string? Category { get; init; }
     public decimal Price { get; init; }
     public string? Description { get; init; }
     public string? Brand { get; init; }
     public string? Photo { get; init; }
-    public int TenantId { get; init; }
+
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        this.Employee = employee;
+        return await userService.CanCreateItemAsync(employee);
+    }
 }
 
 public class CreateItemCommandHandler: IRequestHandler<CreateItemCommand, ItemDto>
@@ -36,7 +42,7 @@ public class CreateItemCommandHandler: IRequestHandler<CreateItemCommand, ItemDt
             Description = request.Description,
             Brand = request.Brand,
             Photo = request.Photo,
-            TenantId = request.TenantId,
+            TenantId = (int)request.Employee.TenantId,
         };
 
         _dbContext.Items.Add(entity);
@@ -59,7 +65,6 @@ public class CreateItemCommandHandler: IRequestHandler<CreateItemCommand, ItemDt
             Description = entity.Description,
             Brand = entity.Brand,
             Photo = entity.Photo,
-            TenantId = entity.TenantId
         };
 
         return itemDto;
