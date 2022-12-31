@@ -10,5 +10,4 @@ public record ItemBodyDto
     public string Description { get; set; }
     public string Brand { get; set; }
     public string Photo { get; set; }
-    public int TenantId { get; set; }
 }

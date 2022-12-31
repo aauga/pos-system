@@ -6,7 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Items;
 
-public record DeleteItemCommand(int Id) : IRequest;
+public record DeleteItemCommand(int Id) : IAuthorizedRequest
+{
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        return await userService.CanManageItemAsync(employee, Id);
+    }
+}
 
 public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand>
 {
