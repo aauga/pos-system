@@ -4,6 +4,7 @@ using Infrastructure;
 using Infrastructure.Persistence;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using WebApi.Filters;
 using WebAPI.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +50,8 @@ builder.Services.AddSwaggerGen(options =>
             new string[] {}
         }
     });
+
+    options.OperationFilter<SwaggerOperationFilters>();
 });
 
 builder.Services.AddControllers(options => {
