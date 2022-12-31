@@ -33,11 +33,6 @@ public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerComman
 
     public async Task<CustomerDto> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
     {
-        if (!_dbContext.Tenants.Any(x => x.Id == request.TenantId))
-        {
-            throw new NotFoundException(nameof(Tenant), request.TenantId);
-        }
-
         var id = _dbContext.Customers.Any() ? _dbContext.Customers.Max(x => x.Id + 1) : 1;
         
         var customer = new Customer
