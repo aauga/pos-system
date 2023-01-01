@@ -9,6 +9,7 @@ namespace Application.Items;
 public record CreateItemCommand : IAuthorizedRequest<ItemDto>
 {
     public Employee Employee;
+    public int TenantId;
     public string Title { get; init; }
     public string Category { get; init; }
     public decimal Price { get; init; }
@@ -19,7 +20,7 @@ public record CreateItemCommand : IAuthorizedRequest<ItemDto>
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
         this.Employee = employee;
-        return await userService.CanCreateItemAsync(employee);
+        return await userService.CanManageTenantAsync(employee, TenantId);
     }
 }
 

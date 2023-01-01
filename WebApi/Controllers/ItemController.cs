@@ -26,10 +26,11 @@ public class ItemController : ApiControllerBase
         return await Mediator.Send(new GetItemQuery(id));
     }
 
-    [HttpPost]
+    [HttpPost("/api/v1/Tenant/{tenantId}")]
     [Summary("Create a new item.")]
-    public async Task<ActionResult<ItemDto>> Create(CreateItemCommand command)
+    public async Task<ActionResult<ItemDto>> Create(int tenantId, [FromBody] CreateItemCommand command)
     {
+        command.TenantId = tenantId;
         return await Mediator.Send(command);
     }
 
