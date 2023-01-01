@@ -1,4 +1,5 @@
-﻿using Application.Items;
+﻿using Application.Common.Attributes;
+using Application.Items;
 using Application.Orders;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -10,46 +11,36 @@ namespace WebApi.Controllers;
 [Authorize]
 public class ItemController : ApiControllerBase
 {
-    /// <summary>
-    /// Get all items.
-    /// </summary>
     [HttpGet]
+    [Summary("Get all items.")]
     public async Task<IEnumerable<ItemDto>> GetItems([FromQuery] GetItemsQuery query)
     {
         return await Mediator.Send(query);
     }
 
-    /// <summary>
-    /// Get item by ID.
-    /// </summary>
     [HttpGet("{id}")]
+    [Summary("Get item by ID.")]
     public async Task<ActionResult<ItemDto>> GetItem(int id)
     {
         return await Mediator.Send(new GetItemQuery(id));
     }
 
-    /// <summary>
-    /// Create a new item.
-    /// </summary>
     [HttpPost]
+    [Summary("Create a new item.")]
     public async Task<ActionResult<ItemDto>> Create(CreateItemCommand command)
     {
         return await Mediator.Send(command);
     }
 
-    /// <summary>
-    /// Replace existing information about an item.
-    /// </summary>
     [HttpPut("{id}")]
+    [Summary("Replace existing information about an item.")]
     public async Task<ActionResult<ItemDto>> Update(int id, [FromBody] ItemBodyDto itemDto)
     {
         return await Mediator.Send(new UpdateItemCommand(id, itemDto));
     }
 
-    /// <summary>
-    /// Delete item.
-    /// </summary>
     [HttpDelete("{id}")]
+    [Summary("Delete item.")]
     public async Task<ActionResult> Delete(int id)
     {
         await Mediator.Send(new DeleteItemCommand(id));
