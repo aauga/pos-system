@@ -14,7 +14,5 @@ public class Order : BaseEntity
     public IEnumerable<Cart> Carts { get; set; }
     public IEnumerable<Payment> Payments { get; set; }
     public IEnumerable<Delivery> Deliveries { get; set; }
-
-    #nullable enable
-    public string? Delivery { get; set; }
+    public string Delivery { get; set; }
 }

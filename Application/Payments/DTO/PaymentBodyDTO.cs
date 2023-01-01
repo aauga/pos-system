@@ -2,6 +2,6 @@
 
 public class PaymentBodyDto
 {
-    public string? Provider { get; set; }
-    public string? Status { get; set; }
+    public string Provider { get; set; }
+    public string Status { get; set; }
 }
