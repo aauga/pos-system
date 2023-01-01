@@ -9,11 +9,11 @@ public record GetOrdersQuery : IAuthorizedRequest<IEnumerable<OrderDto>>
 {
     public int offset { get; init; } = 0;
     public int limit { get; init; } = 20;
-    internal Employee employee { get; set; }
+    internal Employee Employee;
 
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        this.employee = employee;
+        Employee = employee;
         return await userService.CanManageOrdersAsync(employee);
     }
 }
@@ -31,7 +31,7 @@ public class GetOrdersQueryHandler : IRequestHandler<GetOrdersQuery, IEnumerable
     {
         var list = await _dbContext.Orders
             .OrderBy(b => b.Id)
-            .Where(b => b.TenantId == request.employee.TenantId)
+            .Where(b => b.TenantId == request.Employee.TenantId)
             .Skip(request.offset)
             .Take(request.limit)
             .Select(order => new OrderDto(order))

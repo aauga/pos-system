@@ -4,6 +4,8 @@ using Application.Orders;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Application.Orders.Commands.UpdateOrderCartTotalCommand;
+
 using System.Net.Sockets;
 
 namespace Application.Carts.Commands.CreateOrderCartCommand;
@@ -67,6 +69,9 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
         }
 
         var cartDto = new CartDto(entity);
+
+        var updater = new UpdateOrderTotal(entity.OrderId, _dbContext);
+        await updater.Update();
 
         return cartDto;
     }

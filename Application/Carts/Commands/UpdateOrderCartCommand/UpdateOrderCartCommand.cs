@@ -1,6 +1,7 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Orders;
+using Application.Orders.Commands.UpdateOrderCartTotalCommand;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -56,6 +57,9 @@ public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartComm
         {
             throw new ForbiddenAccessException();
         }
+
+        var updater = new UpdateOrderTotal(entity.OrderId, _dbContext);
+        await updater.Update();
 
         var cartDto = new CartDto(entity);
 

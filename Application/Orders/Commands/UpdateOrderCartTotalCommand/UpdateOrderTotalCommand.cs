@@ -6,28 +6,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders.Commands.UpdateOrderCartTotalCommand;
 
-public record UpdateOrderTotalCommand(int id) : IRequest;
-
-public class UpdateOrderTotalCommandHandler : IRequestHandler<UpdateOrderTotalCommand>
+public class UpdateOrderTotal
 {
+    private int Id;
     private readonly IApplicationDbContext _dbContext;
 
-    public UpdateOrderTotalCommandHandler(IApplicationDbContext dbContext)
+    public UpdateOrderTotal(int id, IApplicationDbContext dbContext)
     {
+        Id = id;
         _dbContext = dbContext;
     }
 
-    public async Task<Unit> Handle(UpdateOrderTotalCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Update()
     {
-        var order = await _dbContext.Orders.FindAsync(request.id);
+        var order = await _dbContext.Orders.FindAsync(Id);
 
         if (order == null)
         {
-            throw new NotFoundException(nameof(Order), request.id);
+            throw new NotFoundException(nameof(Order), Id);
         }
 
         var carts = _dbContext.Carts
-            .Where(b => b.OrderId == request.id)
+            .Where(b => b.OrderId == Id)
             .ToList();
 
         decimal total = 0;

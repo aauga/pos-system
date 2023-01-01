@@ -59,7 +59,7 @@ public class UserService : IUserService
 
     public async Task<bool> CanManageOrdersAsync(Employee employee)
     {
-        var authorized = employee.Position >= PositionType.Cashier;
+        var authorized = employee.Position == PositionType.Cashier || employee.Position == PositionType.Manager || employee.Position == PositionType.Admin;
         return await Task.FromResult(authorized);
     }
 }

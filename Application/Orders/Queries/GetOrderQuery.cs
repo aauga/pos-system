@@ -9,10 +9,10 @@ namespace Application.Orders;
 
 public record GetOrderQuery(int id) : IAuthorizedRequest<OrderDto>
 {
-    internal Employee employee;
+    internal Employee Employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        this.employee = employee;
+        Employee = employee;
         return await userService.CanManageOrdersAsync(employee);
     }
 }
@@ -28,7 +28,7 @@ public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, OrderDto>
 
     public async Task<OrderDto> Handle(GetOrderQuery request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.id);
+        var order = await _dbContext.Orders.Where(b => b.TenantId == request.Employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.id);
 
         if (order == default(Order))
         {

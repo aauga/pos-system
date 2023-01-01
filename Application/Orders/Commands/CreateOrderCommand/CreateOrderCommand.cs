@@ -9,10 +9,10 @@ namespace Application.Orders.Commands.CreateOrderCommand;
 
 public record CreateOrderCommand(OrderBodyDto orderBodyDto) : IAuthorizedRequest<OrderDto>
 {
-    internal Employee employee;
+    internal Employee Employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        this.employee = employee;
+        Employee = employee;
         return await userService.CanManageOrdersAsync(employee);
     }
 }
@@ -31,8 +31,8 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
         var entity = new Order
         {
             CustomerId = request.orderBodyDto.CustomerId,
-            EmployeeId = request.employee.Id,
-            TenantId = request.employee.TenantId,
+            EmployeeId = request.Employee.Id,
+            TenantId = request.Employee.TenantId,
             Total = request.orderBodyDto.Total,
             Tip = request.orderBodyDto.Tip,
             Delivery = request.orderBodyDto.Delivery,

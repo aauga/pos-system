@@ -5,21 +5,14 @@ using Application.Carts;
 using WebUI.Controllers;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using WebAPI.Filters;
 using Application.Orders.Commands.CreateOrderCommand;
 using Application.Carts.Commands.CreateOrderCartCommand;
 using Application.Carts.Commands.UpdateOrderCartCommand;
 using Application.Carts.Commands.DeleteOrderCartCommand;
 using Application.Orders.Commands.UpdateOrderCommand;
 using Application.Orders.Commands.DeleteOrderCommand;
-using Application.Orders.Commands.UpdateOrderCartTotalCommand;
 using Application.Deliveries.Commands.CreateOrderDeliveryCommand;
 using Application.Payments.Commands.CreateOrderPaymentCommand;
-using Swashbuckle.AspNetCore.Annotations;
 using Application.Common.Attributes;
 
 namespace WebApi.Controllers;
@@ -78,7 +71,6 @@ public class OrderController : ApiControllerBase
     public async Task<ActionResult<CartDto>> AddOrderCart(int id, [FromBody] CartItemIdDto cartItemIdDto)
     {
         var cart = await Mediator.Send(new CreateOrderCartCommand(id, cartItemIdDto));
-        await Mediator.Send(new UpdateOrderTotalCommand(id));
         return Created(cart);
     }
 
@@ -94,7 +86,6 @@ public class OrderController : ApiControllerBase
     public async Task<ActionResult<CartDto>> UpdateOrderCart(int orderId, int itemId, [FromBody] CartBodyDto cartBodyDto)
     {
         var cart = await Mediator.Send(new UpdateOrderCartCommand(orderId, itemId, cartBodyDto));
-        await Mediator.Send(new UpdateOrderTotalCommand(orderId));
         return cart;
     }
 
@@ -103,7 +94,6 @@ public class OrderController : ApiControllerBase
     public async Task<ActionResult<CartDto>> DeleteOrderCart(int orderId, int itemId)
     {
         var cart = await Mediator.Send(new DeleteOrderCartCommand(orderId, itemId));
-        await Mediator.Send(new UpdateOrderTotalCommand(orderId));
         return Ok();
     }
 

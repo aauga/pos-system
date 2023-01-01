@@ -8,10 +8,10 @@ namespace Application.Orders.Commands.UpdateOrderCommand;
 
 public record UpdateOrderCommand (int id, OrderBodyDto orderBodyDto) : IAuthorizedRequest<OrderDto>
 {
-    internal Employee employee;
+    internal Employee Employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        this.employee = employee;
+        Employee = employee;
         return await userService.CanManageOrdersAsync(employee);
     }
 }
@@ -27,7 +27,7 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
 
     public async Task<OrderDto> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.id);
+        var entity = await _dbContext.Orders.Where(b => b.TenantId == request.Employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.id);
 
         if (entity == default(Order))
         {
@@ -35,8 +35,8 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
         }
 
         entity.CustomerId = request.orderBodyDto.CustomerId;
-        entity.TenantId = request.employee.TenantId;
-        entity.EmployeeId = request.employee.Id;
+        entity.TenantId = request.Employee.TenantId;
+        entity.EmployeeId = request.Employee.Id;
         entity.Total = request.orderBodyDto.Total;
         entity.Tip = request.orderBodyDto.Tip;
         entity.Delivery = request.orderBodyDto.Delivery;
