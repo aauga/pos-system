@@ -17,4 +17,16 @@
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.4.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Items\" />
+      <None Remove="Items\Commands\" />
+      <None Remove="Items\DTO\" />
+      <None Remove="Items\Queries\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Items\" />
+      <Folder Include="Items\Commands\" />
+      <Folder Include="Items\DTO\" />
+      <Folder Include="Items\Queries\" />
+    </ItemGroup>
 </Project>
