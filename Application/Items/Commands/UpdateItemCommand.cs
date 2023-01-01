@@ -40,14 +40,7 @@ public class UpdateItemCommandHandler : IRequestHandler<UpdateItemCommand, ItemD
         entity.Brand = request.Item.Brand;
         entity.Photo = request.Item.Photo;
 
-        try
-        {
-            await _dbContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException)
-        {
-            throw new ForbiddenAccessException();
-        }
+        await _dbContext.SaveChangesAsync();
 
         var itemDto = new ItemDto
         {

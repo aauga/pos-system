@@ -33,14 +33,7 @@ public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand>
         }
         _dbContext.Items.Remove(entity);
 
-        try
-        {
-            await _dbContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException)
-        {
-            throw new ForbiddenAccessException();
-        }
+        await _dbContext.SaveChangesAsync();
 
         return Unit.Value;
     }

@@ -9,12 +9,12 @@ namespace Application.Items;
 public record CreateItemCommand : IAuthorizedRequest<ItemDto>
 {
     public Employee Employee;
-    public string? Title { get; init; }
-    public string? Category { get; init; }
+    public string Title { get; init; }
+    public string Category { get; init; }
     public decimal Price { get; init; }
-    public string? Description { get; init; }
-    public string? Brand { get; init; }
-    public string? Photo { get; init; }
+    public string Description { get; init; }
+    public string Brand { get; init; }
+    public string Photo { get; init; }
 
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
@@ -42,19 +42,12 @@ public class CreateItemCommandHandler: IRequestHandler<CreateItemCommand, ItemDt
             Description = request.Description,
             Brand = request.Brand,
             Photo = request.Photo,
-            TenantId = (int)request.Employee.TenantId,
+            TenantId = request.Employee.TenantId,
         };
 
         _dbContext.Items.Add(entity);
 
-        try
-        {
-            await _dbContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException)
-        {
-            throw new ForbiddenAccessException();
-        }
+        await _dbContext.SaveChangesAsync();
 
         var itemDto = new ItemDto
         {
