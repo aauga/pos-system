@@ -56,41 +56,4 @@ public class UserService : IUserService
     {
         return await _dbContext.Tenants.AnyAsync(x => x.Id == tenantId);
     }
-
-    public async Task<bool> CanViewItemsAsync(Employee employee, int itemId)
-    {
-        var item = await _dbContext.Items.FindAsync(itemId);
-        var authorizedTenant = item != null ? item.TenantId == employee.TenantId : true;
-        var authorizedPosition = employee.Position >= PositionType.Cashier;
-
-        return await Task.FromResult(authorizedTenant && authorizedPosition);
-    }
-
-    public async Task<bool> CanViewItemsAsync(Employee employee)
-    {
-        var authorized = employee.Position >= PositionType.Cashier;
-
-        return await Task.FromResult(authorized);
-    }
-
-    public async Task<bool> CanCreateItemAsync(Employee employee)
-    {
-        var authorizedPosition = employee.Position >= PositionType.Manager;
-
-        return await Task.FromResult(authorizedPosition);
-    }
-
-    public async Task<bool> CanManageItemAsync(Employee employee, int itemId)
-    {
-        var item = await _dbContext.Items.FindAsync(itemId);
-        var authorizedTenant = item != null ? item.TenantId == employee.TenantId : true;
-        var authorizedPosition = employee.Position >= PositionType.Manager;
-
-        return await Task.FromResult(authorizedTenant && authorizedPosition);
-    }
-
-    private async Task<bool> ItemExistsAsync(int itemId)
-    {
-        return await _dbContext.Items.AnyAsync(x => x.Id == itemId);
-    }
 }
