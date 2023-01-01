@@ -6,13 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders.Commands.DeleteOrderCommand;
 
-public record DeleteOrderCommand(int id) : IAuthorizedRequest
+public record DeleteOrderCommand(int Id) : IAuthorizedRequest
 {
-    internal Employee Employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        Employee = employee;
-        return await userService.CanManageOrdersAsync(employee);
+        var order = await dbContext.Orders.FindAsync(Id);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
     }
 }
 
@@ -27,11 +26,11 @@ public class DeleteOrderCommandHandler : IRequestHandler<DeleteOrderCommand>
 
     public async Task<Unit> Handle(DeleteOrderCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Orders.Where(b => b.TenantId == request.Employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.id);
+        var entity = await _dbContext.Orders.FindAsync(request.Id);
 
-        if (entity == default(Order))
+        if (entity == null)
         {
-            throw new NotFoundException(nameof(Order), request.id);
+            throw new NotFoundException(nameof(Order), request.Id);
         }
         _dbContext.Orders.Remove(entity);
 

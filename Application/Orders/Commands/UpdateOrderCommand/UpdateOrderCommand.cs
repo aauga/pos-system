@@ -6,13 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders.Commands.UpdateOrderCommand;
 
-public record UpdateOrderCommand (int id, OrderBodyDto orderBodyDto) : IAuthorizedRequest<OrderDto>
+public record UpdateOrderCommand (int Id, OrderBodyDto orderBodyDto) : IAuthorizedRequest<OrderDto>
 {
-    internal Employee Employee;
+    public Employee Employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
         Employee = employee;
-        return await userService.CanManageOrdersAsync(employee);
+        var order = await dbContext.Orders.FindAsync(Id);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
     }
 }
 
@@ -27,11 +28,11 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
 
     public async Task<OrderDto> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Orders.Where(b => b.TenantId == request.Employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.id);
+        var entity = await _dbContext.Orders.FindAsync(request.Id);
 
-        if (entity == default(Order))
+        if (entity == null)
         {
-            throw new NotFoundException(nameof(Order), request.id);
+            throw new NotFoundException(nameof(Order), request.Id);
         }
 
         entity.CustomerId = request.orderBodyDto.CustomerId;

@@ -7,13 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders.Commands.CreateOrderCommand;
 
-public record CreateOrderCommand(OrderBodyDto orderBodyDto) : IAuthorizedRequest<OrderDto>
+public record CreateOrderCommand(int TenantId, OrderBodyDto orderBodyDto) : IAuthorizedRequest<OrderDto>
 {
-    internal Employee Employee;
+    public Employee Employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
         Employee = employee;
-        return await userService.CanManageOrdersAsync(employee);
+        return await userService.CanAccessTenantAsync(employee, TenantId);
     }
 }
 

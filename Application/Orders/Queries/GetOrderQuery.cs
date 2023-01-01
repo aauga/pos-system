@@ -7,13 +7,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders;
 
-public record GetOrderQuery(int id) : IAuthorizedRequest<OrderDto>
+public record GetOrderQuery(int Id) : IAuthorizedRequest<OrderDto>
 {
-    internal Employee Employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        Employee = employee;
-        return await userService.CanManageOrdersAsync(employee);
+        var order = await dbContext.Orders.FindAsync(Id);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
     }
 }
 
@@ -28,11 +27,11 @@ public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, OrderDto>
 
     public async Task<OrderDto> Handle(GetOrderQuery request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.Where(b => b.TenantId == request.Employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.id);
+        var order = await _dbContext.Orders.FindAsync(request.Id);
 
-        if (order == default(Order))
+        if (order == null)
         {
-            throw new NotFoundException(nameof(Order), request.id);
+            throw new NotFoundException(nameof(Order), request.Id);
         }
 
         var orderDto = new OrderDto(order);

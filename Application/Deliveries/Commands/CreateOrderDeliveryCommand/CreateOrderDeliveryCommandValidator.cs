@@ -11,7 +11,7 @@ public class CreateOrderDeliveryCommandValidator : AbstractValidator<CreateOrder
 {
     public CreateOrderDeliveryCommandValidator()
     {
-        RuleFor(x => x.orderId).NotEmpty();
+        RuleFor(x => x.OrderId).NotEmpty();
     }
 }
 

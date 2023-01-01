@@ -20,10 +20,11 @@ namespace WebApi.Controllers;
 
 public class OrderController : ApiControllerBase
 {
-    [HttpGet]
+    [HttpGet("Tenant/{id}")]
     [Summary("Get orders.")]
-    public async Task<IEnumerable<OrderDto>> GetOrders([FromQuery] GetOrdersQuery query)
+    public async Task<IEnumerable<OrderDto>> GetOrders(int id, [FromQuery] GetOrdersQuery query)
     {
+        query.TenantId = id;
         return await Mediator.Send(query);
     }
 
@@ -34,12 +35,12 @@ public class OrderController : ApiControllerBase
         return await Mediator.Send(new GetOrderQuery(id));
     }
 
-    [HttpPost]
+    [HttpPost("Tenant/{tenantId}")]
     [Summary("Create a new order.")]
 
-    public async Task<ActionResult<OrderDto>> Create([FromBody] OrderBodyDto orderBodyDto)
+    public async Task<ActionResult<OrderDto>> Create(int tenantId, [FromBody] OrderBodyDto orderBodyDto)
     {
-        var order = await Mediator.Send(new CreateOrderCommand(orderBodyDto));
+        var order = await Mediator.Send(new CreateOrderCommand(tenantId, orderBodyDto));
         return Created(order);
     }
 

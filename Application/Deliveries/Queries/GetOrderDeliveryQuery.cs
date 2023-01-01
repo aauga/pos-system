@@ -6,13 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Deliveries;
 
-public record GetOrderDeliveryQuery (int orderId) : IAuthorizedRequest<IEnumerable<DeliveryDto>>
+public record GetOrderDeliveryQuery (int OrderId) : IAuthorizedRequest<IEnumerable<DeliveryDto>>
 {
-    internal Employee employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        this.employee = employee;
-        return await userService.CanManageOrdersAsync(employee);
+        var order = await dbContext.Orders.FindAsync(OrderId);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
     }
 }
 
@@ -28,15 +27,15 @@ public class GetOrderDeliveryQueryHandler : IRequestHandler<GetOrderDeliveryQuer
 
     public async Task<IEnumerable<DeliveryDto>> Handle(GetOrderDeliveryQuery request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.orderId);
+        var order = await _dbContext.Orders.FindAsync(request.OrderId);
 
-        if (order == default(Order))
+        if (order == null)
         {
-            throw new NotFoundException(nameof(Order), request.orderId);
+            throw new NotFoundException(nameof(Order), request.OrderId);
         }
 
         var list = await _dbContext.Deliveries
-            .Where(b => b.OrderId == request.orderId)
+            .Where(b => b.OrderId == request.OrderId)
             .Select(item => new DeliveryDto
             {
                 Id = item.Id,

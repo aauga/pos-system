@@ -6,13 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Payments;
 
-public record GetOrderPaymentQuery(int orderId) : IAuthorizedRequest<IEnumerable<PaymentDto>>
+public record GetOrderPaymentQuery(int OrderId) : IAuthorizedRequest<IEnumerable<PaymentDto>>
 {
-    internal Employee employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        this.employee = employee;
-        return await userService.CanManageOrdersAsync(employee);
+        var order = await dbContext.Orders.FindAsync(OrderId);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
     }
 }
 
@@ -27,17 +26,15 @@ public class GetOrderPaymentQueryHandler : IRequestHandler<GetOrderPaymentQuery,
 
     public async Task<IEnumerable<PaymentDto>> Handle(GetOrderPaymentQuery request, CancellationToken cancellationToken)
     {
-        var ten = request.employee.TenantId;
-        var ord = request.orderId;
-        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.orderId);
+        var order = await _dbContext.Orders.FindAsync(request.OrderId);
 
-        if (order == default(Order))
+        if (order == null)
         {
-            throw new NotFoundException(nameof(Order), request.orderId);
+            throw new NotFoundException(nameof(Order), request.OrderId);
         }
 
         var list = await _dbContext.Payments
-            .Where(b => b.OrderId == request.orderId)
+            .Where(b => b.OrderId == request.OrderId)
             .Select(payment => new PaymentDto(payment))
             .ToListAsync();
 

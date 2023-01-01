@@ -6,13 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Deliveries.Commands.CreateOrderDeliveryCommand;
 
-public record CreateOrderDeliveryCommand(int orderId, DeliveryBodyDto deliveryBodyDto) : IAuthorizedRequest<DeliveryDto>
+public record CreateOrderDeliveryCommand(int OrderId, DeliveryBodyDto deliveryBodyDto) : IAuthorizedRequest<DeliveryDto>
 {
-    internal Employee employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        this.employee = employee;
-        return await userService.CanManageOrdersAsync(employee);
+        var order = await dbContext.Orders.FindAsync(OrderId);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
     }
 }
 
@@ -28,16 +27,16 @@ public class CreateOrderDeliveryCommandHandler : IRequestHandler<CreateOrderDeli
 
     public async Task<DeliveryDto> Handle(CreateOrderDeliveryCommand request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.orderId);
+        var order = await _dbContext.Orders.FindAsync(request.OrderId);
 
-        if (order == default(Order))
+        if (order == null)
         {
-            throw new NotFoundException(nameof(Order), request.orderId);
+            throw new NotFoundException(nameof(Order), request.OrderId);
         }
 
         var entity = new Delivery
         {
-            OrderId = request.orderId,
+            OrderId = request.OrderId,
             Address = request.deliveryBodyDto.Address,
             PostCode = request.deliveryBodyDto.PostCode,
             Details = request.deliveryBodyDto.Details

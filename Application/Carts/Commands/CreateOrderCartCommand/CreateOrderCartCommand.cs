@@ -10,13 +10,12 @@ using System.Net.Sockets;
 
 namespace Application.Carts.Commands.CreateOrderCartCommand;
 
-public record CreateOrderCartCommand(int orderId, CartItemIdDto cartItemIdDto) : IAuthorizedRequest<CartDto>
+public record CreateOrderCartCommand(int OrderId, CartItemIdDto cartItemIdDto) : IAuthorizedRequest<CartDto>
 {
-    internal Employee employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        this.employee = employee;
-        return await userService.CanManageOrdersAsync(employee);
+        var order = await dbContext.Orders.FindAsync(OrderId);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
     }
 }
 
@@ -32,25 +31,16 @@ public class CreateOrderCartCommandHandler : IRequestHandler<CreateOrderCartComm
 
     public async Task<CartDto> Handle(CreateOrderCartCommand request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.orderId);
+        var order = await _dbContext.Orders.FindAsync(request.OrderId);
 
-        if (order == default(Order))
+        if (order == null)
         {
-            throw new NotFoundException(nameof(Order), request.orderId);
+            throw new NotFoundException(nameof(Order), request.OrderId);
         }
-
-        /*var cart = await _dbContext.Carts
-            .Where(b => b.OrderId == request.orderId && b.ItemId == request.cartItemIdDto.ItemId)
-            .ToListAsync();
-
-        if (cart.Count != 0)
-        {
-            throw new ForbiddenAccessException();
-        }*/
 
         var entity = new Cart
         {
-            OrderId = request.orderId,
+            OrderId = request.OrderId,
             ItemId = request.cartItemIdDto.ItemId,
             Quantity = request.cartItemIdDto.Quantity,
             Discount = request.cartItemIdDto.Discount,

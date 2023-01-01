@@ -9,12 +9,12 @@ public record GetOrdersQuery : IAuthorizedRequest<IEnumerable<OrderDto>>
 {
     public int offset { get; init; } = 0;
     public int limit { get; init; } = 20;
-    internal Employee Employee;
-
+    public Employee Employee;
+    public int TenantId;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
         Employee = employee;
-        return await userService.CanManageOrdersAsync(employee);
+        return await userService.CanAccessTenantAsync(employee, TenantId);
     }
 }
 

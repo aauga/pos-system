@@ -7,13 +7,12 @@ using System.Net.Sockets;
 
 namespace Application.Payments.Commands.CreateOrderPaymentCommand;
 
-public record CreateOrderPaymentCommand(int orderId, PaymentBodyDto paymentBodyDto) : IAuthorizedRequest<PaymentDto>
+public record CreateOrderPaymentCommand(int OrderId, PaymentBodyDto paymentBodyDto) : IAuthorizedRequest<PaymentDto>
 {
-    internal Employee employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        this.employee = employee;
-        return await userService.CanManageOrdersAsync(employee);
+        var order = await dbContext.Orders.FindAsync(OrderId);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
     }
 }
 
@@ -29,16 +28,16 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
 
     public async Task<PaymentDto> Handle(CreateOrderPaymentCommand request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.orderId);
+        var order = await _dbContext.Orders.FindAsync(request.OrderId);
 
-        if (order == default(Order))
+        if (order == null)
         {
-            throw new NotFoundException(nameof(Order), request.orderId);
+            throw new NotFoundException(nameof(Order), request.OrderId);
         }
 
         var entity = new Payment
         {
-            OrderId = request.orderId,
+            OrderId = request.OrderId,
             Provider = request.paymentBodyDto.Provider,
             Status = request.paymentBodyDto.Status
         };

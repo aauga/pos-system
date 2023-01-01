@@ -6,13 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Carts;
 
-public record GetOrderCartQuery (int orderId, int itemId) : IAuthorizedRequest<CartDto>
+public record GetOrderCartQuery (int OrderId, int ItemId) : IAuthorizedRequest<CartDto>
 {
-    internal Employee employee;
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        this.employee = employee;
-        return await userService.CanManageOrdersAsync(employee);
+        var order = await dbContext.Orders.FindAsync(OrderId);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
     }
 }
 
@@ -27,15 +26,15 @@ public class GetOrderCartQueryHandler : IRequestHandler<GetOrderCartQuery, CartD
 
     public async Task<CartDto> Handle(GetOrderCartQuery request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.Where(b => b.TenantId == request.employee.TenantId).SingleOrDefaultAsync(b => b.Id == request.orderId);
+        var order = await _dbContext.Orders.FindAsync(request.OrderId);
 
-        if (order == default(Order))
+        if (order == null)
         {
-            throw new NotFoundException(nameof(Order), request.orderId);
+            throw new NotFoundException(nameof(Order), request.OrderId);
         }
 
         var cart = await _dbContext.Carts
-            .SingleAsync(b => b.OrderId == request.orderId && b.ItemId == request.itemId);
+            .SingleAsync(b => b.OrderId == request.OrderId && b.ItemId == request.ItemId);
 
         if (cart == null)
         {
