@@ -11,7 +11,7 @@ namespace WebApi.Controllers;
 [Authorize]
 public class ItemController : ApiControllerBase
 {
-    [HttpGet("/api/v1/Tenant/{tenantId}")]
+    [HttpGet("Tenant/{tenantId}")]
     [Summary("Get all items of tenant.")]
     public async Task<IEnumerable<ItemDto>> GetItems(int tenantId, [FromQuery] GetItemsQuery query)
     {
@@ -26,7 +26,7 @@ public class ItemController : ApiControllerBase
         return await Mediator.Send(new GetItemQuery(id));
     }
 
-    [HttpPost("/api/v1/Tenant/{tenantId}")]
+    [HttpPost("Tenant/{tenantId}")]
     [Summary("Create a new item.")]
     public async Task<ActionResult<ItemDto>> Create(int tenantId, [FromBody] CreateItemCommand command)
     {
