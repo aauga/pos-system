@@ -42,28 +42,19 @@ public class OrderController : ApiControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<OrderDto>> Create([FromBody] OrderBodyDto orderBodyDto)
     [Summary("Create a new order.")]
-    public async Task<ActionResult<OrderDto>> Create(CreateOrderCommand command)
+
+    public async Task<ActionResult<OrderDto>> Create([FromBody] OrderBodyDto orderBodyDto)
     {
         var order = await Mediator.Send(new CreateOrderCommand(orderBodyDto));
         return Created(order);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<OrderDto>> Update(int id, [FromBody] OrderBodyDto orderBodyDto)
     [Summary("Replace existing information about an order.")]
-    public async Task<ActionResult<OrderDto>> Update(int id, UpdateOrderCommand command)
+    public async Task<ActionResult<OrderDto>> Update(int id, [FromBody] OrderBodyDto orderBodyDto)
     {
         return await Mediator.Send(new UpdateOrderCommand(id, orderBodyDto));
-
-        //return NoContent();
-        if (id != command.Id)
-        {
-            return BadRequest();
-        }
-
-        return await Mediator.Send(command);
     }
 
     [HttpDelete("{id}")]
