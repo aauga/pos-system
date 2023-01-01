@@ -11,10 +11,11 @@ namespace WebApi.Controllers;
 [Authorize]
 public class ItemController : ApiControllerBase
 {
-    [HttpGet]
-    [Summary("Get all items.")]
-    public async Task<IEnumerable<ItemDto>> GetItems([FromQuery] GetItemsQuery query)
+    [HttpGet("/api/v1/Tenant/{tenantId}")]
+    [Summary("Get all items of tenant.")]
+    public async Task<IEnumerable<ItemDto>> GetItems(int tenantId, [FromQuery] GetItemsQuery query)
     {
+        query.TenantId = tenantId;
         return await Mediator.Send(query);
     }
 

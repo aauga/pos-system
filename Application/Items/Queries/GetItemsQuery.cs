@@ -10,13 +10,14 @@ namespace Application.Items;
 public record GetItemsQuery : IAuthorizedRequest<IEnumerable<ItemDto>>
 {
     public Employee employee;
+    public int TenantId;
     public int Offset { get; init; } = 0;
     public int Limit { get; init; } = 20;
 
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
         this.employee = employee;
-        return await userService.CanViewItemsAsync(employee);
+        return await userService.CanAccessTenantAsync(employee, TenantId);
     }
 }
 
