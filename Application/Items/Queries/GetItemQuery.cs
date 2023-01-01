@@ -13,7 +13,8 @@ public record GetItemQuery(int Id) : IAuthorizedRequest<ItemDto>
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
         this.Employee = employee;
-        return await userService.CanViewItemsAsync(employee, Id);
+        var item = await dbContext.Items.FindAsync(Id);
+        return item != null ? await userService.CanAccessTenantAsync(employee, item.TenantId) : true;
     }
 }
 
