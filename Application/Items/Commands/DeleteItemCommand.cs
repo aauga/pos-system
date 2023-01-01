@@ -10,7 +10,8 @@ public record DeleteItemCommand(int Id) : IAuthorizedRequest
 {
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
-        return await userService.CanManageItemAsync(employee, Id);
+        var item = await dbContext.Items.FindAsync(Id);
+        return item != null ? await userService.CanManageTenantAsync(employee, item.TenantId) : true;
     }
 }
 
