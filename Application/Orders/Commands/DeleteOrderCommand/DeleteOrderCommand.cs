@@ -1,13 +1,19 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
-using Application.Orders;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Orders;
+namespace Application.Orders.Commands.DeleteOrderCommand;
 
-public record DeleteOrderCommand (int Id) : IRequest;
+public record DeleteOrderCommand(int Id) : IAuthorizedRequest
+{
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        var order = await dbContext.Orders.FindAsync(Id);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
+    }
+}
 
 public class DeleteOrderCommandHandler : IRequestHandler<DeleteOrderCommand>
 {

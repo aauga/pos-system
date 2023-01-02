@@ -5,9 +5,16 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Sockets;
 
-namespace Application.Payments;
+namespace Application.Payments.Commands.CreateOrderPaymentCommand;
 
-public record CreateOrderPaymentCommand (int orderId, PaymentBodyDto paymentBodyDto) : IRequest<PaymentDto>;
+public record CreateOrderPaymentCommand(int OrderId, PaymentBodyDto paymentBodyDto) : IAuthorizedRequest<PaymentDto>
+{
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        var order = await dbContext.Orders.FindAsync(OrderId);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
+    }
+}
 
 
 public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPaymentCommand, PaymentDto>
@@ -21,20 +28,19 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
 
     public async Task<PaymentDto> Handle(CreateOrderPaymentCommand request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.FindAsync(request.orderId);
+        var order = await _dbContext.Orders.FindAsync(request.OrderId);
 
         if (order == null)
         {
-            throw new NotFoundException(nameof(Order), request.orderId);
+            throw new NotFoundException(nameof(Order), request.OrderId);
         }
 
         var entity = new Payment
         {
-            OrderId = request.orderId,
+            OrderId = request.OrderId,
             Provider = request.paymentBodyDto.Provider,
-            Status= request.paymentBodyDto.Status
+            Status = request.paymentBodyDto.Status
         };
-        
 
         _dbContext.Payments.Add(entity);
 
@@ -47,13 +53,7 @@ public class CreateOrderPaymentCommandHandler : IRequestHandler<CreateOrderPayme
             throw new ForbiddenAccessException();
         }
 
-        var deliveryDto = new PaymentDto
-        {
-            Id = entity.Id,
-            OrderId = entity.OrderId,
-            Provider = request.paymentBodyDto.Provider,
-            Status = request.paymentBodyDto.Status
-        };
+        var deliveryDto = new PaymentDto(entity);
 
         return deliveryDto;
     }

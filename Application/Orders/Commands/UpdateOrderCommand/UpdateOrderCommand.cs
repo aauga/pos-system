@@ -1,21 +1,20 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
-using Application.Orders;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Orders;
+namespace Application.Orders.Commands.UpdateOrderCommand;
 
-public class UpdateOrderCommand : IRequest<OrderDto>
+public record UpdateOrderCommand (int Id, OrderBodyDto orderBodyDto) : IAuthorizedRequest<OrderDto>
 {
-    public int Id { get; init; }
-    public int CustomerId { get; init; }
-    public int EmployeeId { get; init; }
-    public decimal Total { get; init; }
-    public int Tip { get; init; }
-    public string Delivery { get; init; }
-    public DateTime Date { get; init; }
+    public Employee Employee;
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        Employee = employee;
+        var order = await dbContext.Orders.FindAsync(Id);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
+    }
 }
 
 public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, OrderDto>
@@ -36,12 +35,13 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
             throw new NotFoundException(nameof(Order), request.Id);
         }
 
-        entity.CustomerId = request.CustomerId;
-        entity.EmployeeId = request.EmployeeId;
-        entity.Total = request.Total;
-        entity.Tip = request.Tip;
-        entity.Delivery = request.Delivery;
-        entity.Date = request.Date;
+        entity.CustomerId = request.orderBodyDto.CustomerId;
+        entity.TenantId = request.Employee.TenantId;
+        entity.EmployeeId = request.Employee.Id;
+        entity.Total = request.orderBodyDto.Total;
+        entity.Tip = request.orderBodyDto.Tip;
+        entity.Delivery = request.orderBodyDto.Delivery;
+        entity.Date = request.orderBodyDto.Date;
 
         try
         {
@@ -52,16 +52,7 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Ord
             throw new ForbiddenAccessException();
         }
 
-        var orderDto = new OrderDto
-        {
-            Id = entity.Id,
-            CustomerId = entity.CustomerId,
-            EmployeeId = entity.EmployeeId,
-            Total = entity.Total,
-            Tip = entity.Tip,
-            Delivery = entity.Delivery,
-            Date = entity.Date
-        };
+        var orderDto = new OrderDto(entity);
 
         return orderDto;
     }
