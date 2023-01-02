@@ -1,24 +1,23 @@
 using Application.Common.Exceptions;
 using Application.Common.Interfaces;
-using Application.Deliveries;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Deliveries;
 
-public record DeleteOrderDeliveryCommand(int Id) : IRequest;
+public record DeleteDeliveryCommand(int Id) : IRequest;
 
-public class DeleteOrderDeliveryCommandHandler : IRequestHandler<DeleteOrderDeliveryCommand>
+public class DeleteDeliveryCommandHandler : IRequestHandler<DeleteDeliveryCommand>
 {
     private readonly IApplicationDbContext _dbContext;
 
-    public DeleteOrderDeliveryCommandHandler(IApplicationDbContext dbContext)
+    public DeleteDeliveryCommandHandler(IApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<Unit> Handle(DeleteOrderDeliveryCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(DeleteDeliveryCommand request, CancellationToken cancellationToken)
     {
         var entity = await _dbContext.Deliveries.FindAsync(request.Id);
 

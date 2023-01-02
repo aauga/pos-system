@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Payments;
 
-public class UpdateOrderPaymentCommand : IRequest<PaymentDto>
+public class UpdatePaymentCommand : IRequest<PaymentDto>
 {
     public int Id { get; init; }
     public int OrderId { get; init; }
@@ -15,16 +15,16 @@ public class UpdateOrderPaymentCommand : IRequest<PaymentDto>
     public string Status { get; init; }
 }
 
-public class UpdateOrderPaymentCommandHandler : IRequestHandler<UpdateOrderPaymentCommand, PaymentDto>
+public class UpdatePaymentCommandHandler : IRequestHandler<UpdatePaymentCommand, PaymentDto>
 {
     private readonly IApplicationDbContext _dbContext;
 
-    public UpdateOrderPaymentCommandHandler(IApplicationDbContext dbContext)
+    public UpdatePaymentCommandHandler(IApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<PaymentDto> Handle(UpdateOrderPaymentCommand request, CancellationToken cancellationToken)
+    public async Task<PaymentDto> Handle(UpdatePaymentCommand request, CancellationToken cancellationToken)
     {
         var entity = await _dbContext.Payments.FindAsync(request.Id);
 

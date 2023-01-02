@@ -115,28 +115,6 @@ public class OrderController : ApiControllerBase
         return await Mediator.Send(new CreateOrderDeliveryCommand(id, deliveryBodyDto));
     }
 
-
-    [HttpPut("{id}/Delivery")]
-    [Summary("Replace existing information about a delivery.")]
-    public async Task<ActionResult<DeliveryDto>> UpdateOrderDelivery(int id, UpdateOrderDeliveryCommand command)
-    {
-        if (id != command.Id)
-        {
-            return BadRequest();
-        }
-
-        return await Mediator.Send(command);
-    }
-
-    [HttpDelete("{id}/Delivery")]
-    [Summary("Replace existing information about a delivery.")]
-    public async Task<ActionResult<Delivery>> DeleteOrderDelivery(int id)
-    {
-        await Mediator.Send(new DeleteOrderDeliveryCommand(id));
-        return Ok();
-
-    }
-
     [HttpGet("{id}/Payment")]
     [Summary("Get all payment identifiers for the specified order.")]
     public async Task<IEnumerable<PaymentDto>> GetOrderPayments(int id)
@@ -151,24 +129,4 @@ public class OrderController : ApiControllerBase
         return await Mediator.Send(new CreateOrderPaymentCommand(id, deliveryBodyDto));
     }
 
-    [HttpPut("{id}/Payment")]
-    [Summary("Replace existing information about a payment.")]
-    public async Task<ActionResult<PaymentDto>> UpdateOrderPayment(int id, UpdateOrderPaymentCommand command)
-    {
-        if (id != command.Id)
-        {
-            return BadRequest();
-        }
-
-        return await Mediator.Send(command);
-    }
-
-    [HttpDelete("{id}/Payment")]
-    [Summary("Replace existing information about a payment.")]
-    public async Task<ActionResult<Payment>> DeleteOrderPayment(int id)
-    {
-        await Mediator.Send(new DeleteOrderPaymentCommand(id));
-        return Ok();
-
-    }
 }

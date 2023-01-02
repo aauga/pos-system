@@ -7,18 +7,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Payments;
 
-public record DeleteOrderPaymentCommand(int Id) : IRequest;
+public record DeletePaymentCommand(int Id) : IRequest;
 
-public class DeleteOrderPaymentCommandHandler : IRequestHandler<DeleteOrderPaymentCommand>
+public class DeletePaymentCommandHandler : IRequestHandler<DeletePaymentCommand>
 {
     private readonly IApplicationDbContext _dbContext;
 
-    public DeleteOrderPaymentCommandHandler(IApplicationDbContext dbContext)
+    public DeletePaymentCommandHandler(IApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<Unit> Handle(DeleteOrderPaymentCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(DeletePaymentCommand request, CancellationToken cancellationToken)
     {
         var entity = await _dbContext.Payments.FindAsync(request.Id);
 
