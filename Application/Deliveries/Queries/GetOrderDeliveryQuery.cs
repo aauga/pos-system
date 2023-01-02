@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Deliveries;
 
-public record GetOrderDeliveryQuery (int orderId) : IRequest<IEnumerable<DeliveryDto>>;
+public record GetOrderDeliveryQuery(int orderId) : IRequest<IEnumerable<DeliveryDto>>;
 
 
 public class GetOrderDeliveryQueryHandler : IRequestHandler<GetOrderDeliveryQuery, IEnumerable<DeliveryDto>>
