@@ -57,7 +57,7 @@ public class OrderController : ApiControllerBase
     {
         await Mediator.Send(new DeleteOrderCommand(id));
         return Ok();
-        
+
     }
 
     [HttpGet("{id}/Cart")]
@@ -127,5 +127,26 @@ public class OrderController : ApiControllerBase
     public async Task<ActionResult<PaymentDto>> AddOrderPayment(int id, [FromBody] PaymentBodyDto deliveryBodyDto)
     {
         return await Mediator.Send(new CreateOrderPaymentCommand(id, deliveryBodyDto));
+    }
+
+    [HttpPut("{id}/Payment")]
+    [Summary("Replace existing information about a payment.")]
+    public async Task<ActionResult<PaymentDto>> UpdateOrderPayment(int id, UpdateOrderPaymentCommand command)
+    {
+        if (id != command.Id)
+        {
+            return BadRequest();
+        }
+
+        return await Mediator.Send(command);
+    }
+
+    [HttpDelete("{id}/Payment")]
+    [Summary("Replace existing information about a payment.")]
+    public async Task<ActionResult<Payment>> DeleteOrderPayment(int id)
+    {
+        await Mediator.Send(new DeleteOrderPaymentCommand(id));
+        return Ok();
+
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Payments;
 
-public record GetOrderPaymentQuery (int orderId) : IRequest<IEnumerable<PaymentDto>>;
+public record GetOrderPaymentQuery(int orderId) : IRequest<IEnumerable<PaymentDto>>;
 
 
 public class GetOrderPaymentQueryHandler : IRequestHandler<GetOrderPaymentQuery, IEnumerable<PaymentDto>>
