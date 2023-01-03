@@ -26,16 +26,16 @@ public class UpdatePaymentCommandHandler : IRequestHandler<UpdatePaymentCommand,
 
     public async Task<PaymentDto> Handle(UpdatePaymentCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _dbContext.Payments.FindAsync(request.Id);
+        var payment = await _dbContext.Payments.FindAsync(request.Id);
 
-        if (entity == null)
+        if (payment == null)
         {
             throw new NotFoundException(nameof(Payment), request.Id);
         }
 
-        entity.OrderId = request.OrderId;
-        entity.Provider = request.Provider;
-        entity.Status = request.Status;
+        payment.OrderId = request.OrderId;
+        payment.Provider = request.Provider;
+        payment.Status = request.Status;
 
         try
         {
@@ -46,13 +46,7 @@ public class UpdatePaymentCommandHandler : IRequestHandler<UpdatePaymentCommand,
             throw new ForbiddenAccessException();
         }
 
-        var paymentDto = new PaymentDto
-        {
-            Id = entity.Id,
-            OrderId = entity.OrderId,
-            Provider = entity.Provider,
-            Status = entity.Status,
-        };
+        var paymentDto = new PaymentDto(payment);
 
         return paymentDto;
     }

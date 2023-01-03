@@ -6,7 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Deliveries;
 
-public record GetOrderDeliveryQuery(int orderId) : IRequest<IEnumerable<DeliveryDto>>;
+public record GetOrderDeliveryQuery(int OrderId) : IAuthorizedRequest<IEnumerable<DeliveryDto>>
+{
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        var order = await dbContext.Orders.FindAsync(OrderId);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
+    }
+}
 
 
 public class GetOrderDeliveryQueryHandler : IRequestHandler<GetOrderDeliveryQuery, IEnumerable<DeliveryDto>>
@@ -20,15 +27,15 @@ public class GetOrderDeliveryQueryHandler : IRequestHandler<GetOrderDeliveryQuer
 
     public async Task<IEnumerable<DeliveryDto>> Handle(GetOrderDeliveryQuery request, CancellationToken cancellationToken)
     {
-        var order = await _dbContext.Orders.FindAsync(request.orderId);
+        var order = await _dbContext.Orders.FindAsync(request.OrderId);
 
         if (order == null)
         {
-            throw new NotFoundException(nameof(Order), request.orderId);
+            throw new NotFoundException(nameof(Order), request.OrderId);
         }
 
         var list = await _dbContext.Deliveries
-            .Where(b => b.OrderId == request.orderId)
+            .Where(b => b.OrderId == request.OrderId)
             .Select(item => new DeliveryDto
             {
                 Id = item.Id,

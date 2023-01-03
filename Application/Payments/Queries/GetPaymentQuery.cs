@@ -25,13 +25,7 @@ public class GetPaymentQueryHandler : IRequestHandler<GetPaymentQuery, PaymentDt
             throw new NotFoundException(nameof(Payment), request.id);
         }
 
-        var paymentDto = new PaymentDto
-        {
-            Id = payment.Id,
-            OrderId = payment.OrderId,
-            Provider = payment.Provider,
-            Status = payment.Status
-        };
+        var paymentDto = new PaymentDto(payment);
 
         return paymentDto;
     }

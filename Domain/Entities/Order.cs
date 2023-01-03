@@ -8,6 +8,8 @@ public class Order : BaseEntity
     public int CustomerId { get; set; }
     public Employee Employee { get; set; }
     public int EmployeeId { get; set; }
+    public Tenant Tenant { get; set; }
+    public int TenantId { get; set; }
     public decimal Total { get; set; }
     public decimal Tip { get; set; }
     public DateTime Date { get; set; }

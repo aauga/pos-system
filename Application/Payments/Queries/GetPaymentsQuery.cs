@@ -26,13 +26,7 @@ public class GetOrdersQueryHandler : IRequestHandler<GetPaymentsQuery, IEnumerab
             .OrderBy(b => b.Id)
             .Skip(request.offset)
             .Take(request.limit)
-            .Select(item => new PaymentDto
-            {
-                Id = item.Id,
-                OrderId = item.OrderId,
-                Provider = item.Provider,
-                Status = item.Status
-            })
+            .Select(item => new PaymentDto(item))
             .ToListAsync();
 
         return list;

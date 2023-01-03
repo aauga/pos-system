@@ -5,11 +5,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders;
 
-public class GetOrdersQuery : IRequest<IEnumerable<OrderDto>>
+public record GetOrdersQuery : IAuthorizedRequest<IEnumerable<OrderDto>>
 {
     public int offset { get; init; } = 0;
     public int limit { get; init; } = 20;
-    //public int? TenantId { get; init; }
+    public Employee Employee;
+    public int TenantId;
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        Employee = employee;
+        return await userService.CanAccessTenantAsync(employee, TenantId);
+    }
 }
 
 public class GetOrdersQueryHandler : IRequestHandler<GetOrdersQuery, IEnumerable<OrderDto>>
@@ -25,18 +31,10 @@ public class GetOrdersQueryHandler : IRequestHandler<GetOrdersQuery, IEnumerable
     {
         var list = await _dbContext.Orders
             .OrderBy(b => b.Id)
+            .Where(b => b.TenantId == request.Employee.TenantId)
             .Skip(request.offset)
             .Take(request.limit)
-            .Select(item => new OrderDto
-            {
-                Id = item.Id,
-                CustomerId = item.CustomerId,
-                EmployeeId = item.EmployeeId,
-                Total = item.Total,
-                Tip = item.Tip,
-                Delivery = item.Delivery,
-                Date = item.Date
-            })
+            .Select(order => new OrderDto(order))
             .ToListAsync();
        
         return list;

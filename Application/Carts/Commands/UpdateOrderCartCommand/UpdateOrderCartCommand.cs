@@ -1,15 +1,22 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Orders;
+using Application.Orders.Commands.UpdateOrderCartTotalCommand;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Sockets;
 
-namespace Application.Carts;
+namespace Application.Carts.Commands.UpdateOrderCartCommand;
 
-public record UpdateOrderCartCommand(int orderId, int itemId, CartBodyDto cartBodyDto) : IRequest<CartDto>;
-
+public record UpdateOrderCartCommand(int OrderId, int ItemId, CartBodyDto cartBodyDto) : IAuthorizedRequest<CartDto>
+{
+    public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
+    {
+        var order = await dbContext.Orders.FindAsync(OrderId);
+        return order != null ? await userService.CanAccessTenantAsync(employee, order.TenantId) : true;
+    }
+}
 
 public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartCommand, CartDto>
 {
@@ -22,12 +29,19 @@ public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartComm
 
     public async Task<CartDto> Handle(UpdateOrderCartCommand request, CancellationToken cancellationToken)
     {
+        var order = await _dbContext.Orders.FindAsync(request.OrderId);
+
+        if (order == null)
+        {
+            throw new NotFoundException(nameof(Order), request.OrderId);
+        }
+
         var entity = await _dbContext.Carts
-             .SingleAsync(b => b.OrderId == request.orderId && b.ItemId == request.itemId);
+             .SingleAsync(b => b.OrderId == request.OrderId && b.ItemId == request.ItemId);
 
         if (entity == null)
         {
-            throw new NotFoundException(nameof(Order), request.orderId);
+            throw new NotFoundException(nameof(Order), request.OrderId);
         }
 
         entity.Quantity = request.cartBodyDto.Quantity;
@@ -42,16 +56,11 @@ public class UpdateOrderCartCommandHandler : IRequestHandler<UpdateOrderCartComm
         {
             throw new ForbiddenAccessException();
         }
-        
-        var cartDto = new CartDto
-        {
-            Id = entity.Id,
-            OrderId = entity.OrderId,
-            ItemId = entity.ItemId,
-            Quantity = entity.Quantity,
-            Discount = entity.Discount,
-            Description = entity.Description
-        };
+
+        var updater = new UpdateOrderTotal(entity.OrderId, _dbContext);
+        await updater.Update();
+
+        var cartDto = new CartDto(entity);
 
         return cartDto;
     }
