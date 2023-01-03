@@ -57,7 +57,7 @@ public class OrderController : ApiControllerBase
     {
         await Mediator.Send(new DeleteOrderCommand(id));
         return Ok();
-        
+
     }
 
     [HttpGet("{id}/Cart")]
@@ -127,4 +127,5 @@ public class OrderController : ApiControllerBase
         var payment = await Mediator.Send(new CreateOrderPaymentCommand(id, deliveryBodyDto));
         return Created(payment);
     }
+
 }

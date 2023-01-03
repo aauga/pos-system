@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Deliveries;
 
-public record GetOrderDeliveryQuery (int OrderId) : IAuthorizedRequest<IEnumerable<DeliveryDto>>
+public record GetOrderDeliveryQuery(int OrderId) : IAuthorizedRequest<IEnumerable<DeliveryDto>>
 {
     public async Task<bool> Authorize(Employee employee, IUserService userService, IApplicationDbContext dbContext)
     {
